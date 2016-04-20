@@ -73,7 +73,7 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.5.2</version>
-			<scope>provide</scope>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
