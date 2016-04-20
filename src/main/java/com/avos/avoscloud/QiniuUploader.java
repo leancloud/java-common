@@ -91,7 +91,7 @@ class QiniuUploader extends HttpClientUploader {
   private AVException uploadWithBlocks() {
 
     try {
-      byte[] bytes = parseFile.getLocalFileData();
+      byte[] bytes = parseFile.getData();
       if (bytes == null) {
         return new AVException("File doesn't exist", new FileNotFoundException());
       }

@@ -127,4 +127,9 @@ public class EmptyPersistence implements InternalPersistence {
   public File getAVFileCacheFile(String url) {
     return null;
   }
+
+  @Override
+  public void cleanAVFileCache(int days) {
+    
+  }
 }

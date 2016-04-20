@@ -20,6 +20,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.avos.avoscloud.internal.InternalConfigurationController;
@@ -1172,5 +1176,13 @@ public class AVUtils {
     if (callback != null) {
       callback.internalDone0(t, parseException);
     }
+  }
+
+  public static String addQueryParams(String path, Map<String, Object> params) {
+    LinkedList<NameValuePair> pairs = new LinkedList<>();
+    for (Map.Entry<String, Object> entry : params.entrySet()) {
+      pairs.add(new BasicNameValuePair(entry.getKey(), JSON.toJSONString(entry.getValue())));
+    }
+    return String.format("%s?%s", path, URLEncodedUtils.format(pairs, "UTF-8"));
   }
 }

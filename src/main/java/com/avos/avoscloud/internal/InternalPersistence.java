@@ -20,7 +20,7 @@ public interface InternalPersistence {
   public String readContentFromFile(File fileForRead);
 
   public byte[] readContentBytesFromFile(File fileForRead);
-  
+
   public void deleteFile(File file);
 
   public void savePersistentSettingBoolean(String keyzone, String key, Boolean value);
@@ -42,8 +42,10 @@ public interface InternalPersistence {
   public String removePersistentSettingString(String keyzone, String key, String defaultValue);
 
   public void removeKeyZonePersistentSettings(String keyzone);
-  
+
   public String getAVFileCachePath();
-  
+
   public File getAVFileCacheFile(String url);
+  
+  public void cleanAVFileCache(int days);
 }

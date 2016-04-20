@@ -1,7 +1,11 @@
 package com.avos.avoscloud.internal;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import com.avos.avoscloud.AVUtils;
 import com.avos.avoscloud.GetDataCallback;
+import com.avos.avoscloud.LogUtil;
 import com.avos.avoscloud.ProgressCallback;
 import com.avos.avoscloud.internal.impl.DefaultAppConfiguration;
 import com.avos.avoscloud.internal.impl.DefaultClientConfiguration;
@@ -19,20 +23,20 @@ public class InternalConfigurationController {
     return instance;
   }
 
-  private ClientConfiguration clientConfiguration;
+  private InternalClientConfiguration clientConfiguration;
   private AppConfiguration appConfiguration;
   private InternalCache cacheImplmentation;
-  private DefaultInternalCallback internalCallback;
+  private InternalCallback internalCallback;
   private InternalLogger internalLogger;
   private InternalPersistence internalPersistence;
 
   private Class<? extends InternalFileDownloader> downloadImplementation;
 
-  public ClientConfiguration getClientConfiguration() {
+  public InternalClientConfiguration getClientConfiguration() {
     return AVUtils.or(clientConfiguration, DefaultClientConfiguration.instance());
   }
 
-  public void setClientConfiguration(ClientConfiguration config) {
+  public void setClientConfiguration(InternalClientConfiguration config) {
     this.clientConfiguration = config;
   }
 
@@ -52,11 +56,11 @@ public class InternalConfigurationController {
     this.cacheImplmentation = cache;
   }
 
-  public void setInternalCallback(DefaultInternalCallback callback) {
+  public void setInternalCallback(InternalCallback callback) {
     internalCallback = callback;
   }
 
-  public DefaultInternalCallback getInternalCallback() {
+  public InternalCallback getInternalCallback() {
     return AVUtils.or(internalCallback, DefaultInternalCallback.instance());
   }
 
@@ -77,18 +81,36 @@ public class InternalConfigurationController {
   }
 
   public InternalFileDownloader getDownloaderInstance(ProgressCallback progressCallback,
-      GetDataCallback getDataCallback){
+      GetDataCallback getDataCallback) {
+    InternalFileDownloader downloader = null;
     if (downloadImplementation != null) {
       try {
-        InternalFileDownloader downloader = downloadImplementation.newInstance();
-        downloader.setProgressCallback(progressCallback);
-        downloader.setGetDataCallback(getDataCallback);
+        downloader = downloadImplementation.newInstance();
         return downloader;
-      } catch (Exception e) {
-       
+      } catch (IllegalAccessException e) {
+        try {
+          Constructor constructor = downloadImplementation.getDeclaredConstructor();
+          constructor.setAccessible(true);
+          downloader = (InternalFileDownloader) constructor.newInstance();
+        } catch (SecurityException | NoSuchMethodException e1) {
+        } catch (InstantiationException e1) {
+          e1.printStackTrace();
+        } catch (IllegalAccessException e1) {
+          e1.printStackTrace();
+        } catch (IllegalArgumentException e1) {
+          e1.printStackTrace();
+        } catch (InvocationTargetException e1) {
+          e1.printStackTrace();
+        }
+      } catch (InstantiationException e) {
       }
     }
-    return null;
+    if (downloader != null) {
+      downloader.setProgressCallback(progressCallback);
+      downloader.setGetDataCallback(getDataCallback);
+    }
+
+    return downloader;
   }
 
   public void setDownloaderImplementation(Class<? extends InternalFileDownloader> clazz) {

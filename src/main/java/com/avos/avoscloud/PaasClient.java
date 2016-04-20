@@ -55,7 +55,6 @@ public class PaasClient {
 
   public static final String sdkVersion = "v3.13-SNAPSHOT";
 
-  private static final String userAgent = "AVOS Cloud android-" + sdkVersion + " SDK";
   private AVUser currentUser = null;
   private AVACL defaultACL;
 
@@ -157,7 +156,7 @@ public class PaasClient {
         .getAppConfiguration().applicationId);
     builder.header("Accept", defaultContentType);
     builder.header("Content-Type", defaultContentType);
-    builder.header("User-Agent", userAgent);
+    builder.header("User-Agent", InternalConfigurationController.globalInstance().getClientConfiguration().getUserAgent());
     builder.header("X-LC-Sign", signRequest());
 
 
@@ -806,8 +805,8 @@ public class PaasClient {
 
   static public String lastModifyFromHeaders(Header[] headers) {
     for (Header h : headers) {
-      if ("Last-Modified".equalsIgnoreCase(h.name.toString())) {
-        return h.value.toString();
+      if ("Last-Modified".equalsIgnoreCase(h.name.utf8())) {
+        return h.value.utf8();
       }
     }
     return null;
@@ -871,7 +870,7 @@ public class PaasClient {
     public static final MediaType JSON = MediaType.parse(defaultContentType);
 
     public AVHttpClient() {
-      client = new OkHttpClient();
+      client = new OkHttpClient();      
       client.setCookieHandler(cookieHandler);
       client.interceptors().addAll(
           InternalConfigurationController.globalInstance().getClientConfiguration()
@@ -992,7 +991,7 @@ public class PaasClient {
     }
   }
 
-  interface ProgressListener {
+  public interface ProgressListener {
     void update(long bytesRead, long contentLength, boolean done);
   }
 }

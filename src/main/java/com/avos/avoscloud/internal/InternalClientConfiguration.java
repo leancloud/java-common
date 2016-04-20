@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.avos.avoscloud.okhttp.Interceptor;
 
-public abstract class ClientConfiguration {
+public abstract class InternalClientConfiguration {
 
   public static final int DEFAULT_NETWORK_TIMEOUT = 15000;
 
@@ -14,6 +14,7 @@ public abstract class ClientConfiguration {
 
   int timeoutInMills = DEFAULT_NETWORK_TIMEOUT;
 
+  public abstract String getUserAgent();
 
   public int getNetworkTimeoutInMills() {
     return timeoutInMills;
@@ -21,5 +22,5 @@ public abstract class ClientConfiguration {
 
   public void setNetworkTimeoutInMills(int timeout) {
     timeoutInMills = timeout;
-  }
+  }  
 }

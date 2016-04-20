@@ -139,7 +139,7 @@ public final class AVFile {
 
         InternalConfigurationController.globalInstance().getInternalPersistence()
             .saveContentToFile(data, new File(localTmpFilePath));
-      }else{
+      } else {
         this.data = data;
       }
       this.metaData.put(FILE_SUM_KEY, md5);
@@ -594,13 +594,15 @@ public final class AVFile {
    * @throws AVException
    */
   public void save() throws AVException {
-    cancelUploadIfNeed();
+    if (AVUtils.isBlankString(objectId)) {
+      cancelUploadIfNeed();
 
-    uploader = this.getUploader(null, null);
+      uploader = this.getUploader(null, null);
 
-    AVException exception = uploader.doWork();
-    if (exception != null)
-      throw exception;
+      AVException exception = uploader.doWork();
+      if (exception != null)
+        throw exception;
+    }
   }
 
   /**
@@ -612,13 +614,22 @@ public final class AVFile {
    */
   public synchronized void saveInBackground(final SaveCallback saveCallback,
       final ProgressCallback progressCallback) {
-    cancelUploadIfNeed();
-    try {
-      uploader = this.getUploader(saveCallback, progressCallback);
-    } catch (AVException e) {
-      saveCallback.internalDone(e);
+    if (AVUtils.isBlankString(objectId)) {
+      cancelUploadIfNeed();
+      try {
+        uploader = this.getUploader(saveCallback, progressCallback);
+      } catch (AVException e) {
+        saveCallback.internalDone(e);
+      }
+      uploader.execute();
+    } else {
+      if (null != saveCallback) {
+        saveCallback.internalDone(null);
+      }
+      if (null != progressCallback) {
+        progressCallback.internalDone(100,null);
+      }
     }
-    uploader.execute();
   }
 
   /**
@@ -873,7 +884,7 @@ public final class AVFile {
     if (!AVUtils.isBlankString(localPath)) {
       return InternalConfigurationController.globalInstance().getInternalPersistence()
           .readContentBytesFromFile(new File(localPath));
-    }else{
+    } else {
       return data;
     }
   }
@@ -888,7 +899,7 @@ public final class AVFile {
     if (!AVUtils.isBlankString(localTmpFilePath)) {
       return InternalConfigurationController.globalInstance().getInternalPersistence()
           .readContentBytesFromFile(new File(localTmpFilePath));
-    }else{
+    } else {
       return data;
     }
   }

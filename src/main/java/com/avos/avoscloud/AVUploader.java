@@ -30,8 +30,6 @@ abstract class AVUploader {
     executor =
         new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
             new LinkedBlockingQueue<Runnable>());
-    InternalConfigurationController.globalInstance().getAppConfiguration()
-        .setupThreadPoolExecutor(executor);
   }
 
 
@@ -45,6 +43,8 @@ abstract class AVUploader {
     this.progressCallback = progressCallback;
     cancelled = false;
     complete = false;
+    InternalConfigurationController.globalInstance().getAppConfiguration()
+        .setupThreadPoolExecutor(executor);
   }
 
   abstract AVException doWork();

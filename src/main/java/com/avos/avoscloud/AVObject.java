@@ -490,13 +490,24 @@ public class AVObject implements Parcelable {
     }
   }
 
+
   /**
    * Deletes this object on the server. This does not delete or destroy the object locally.
    *
    * @throws AVException Throws an error if the object does not exist or if the internet fails.
    */
   public void delete() throws AVException {
-    delete(true, false, new DeleteCallback() {
+    delete(null);
+  }
+
+  /**
+   * Deletes this object on the server. This does not delete or destroy the object locally.
+   *
+   * @param option options for server to
+   * @throws Exception AVException Throws an error if the object does not exist or if the internet fails.
+   */
+  public void delete(AVDeleteOption option) throws AVException {
+    delete(true, false, option, new DeleteCallback() {
       @Override
       public void done(AVException e) {
         if (e != null) {
@@ -513,6 +524,7 @@ public class AVObject implements Parcelable {
       throw AVExceptionHolder.remove();
     }
   }
+
 
   /**
    * Delete AVObject in batch.The objects class name must be the same.
@@ -639,7 +651,7 @@ public class AVObject implements Parcelable {
    * @param callback callback which will be called if the delete completes before the app exits.
    */
   public void deleteEventually(DeleteCallback callback) {
-    delete(false, true, callback);
+    delete(false, true, null, callback);
   }
 
   /**
@@ -647,7 +659,28 @@ public class AVObject implements Parcelable {
    * save completes. Use this when you don't care if the delete works.
    */
   public void deleteInBackground() {
-    deleteInBackground(null);
+    deleteInBackground(null, null);
+  }
+
+  /**
+   * Deletes this object on the server in a background thread. Does nothing in particular when the
+   * save completes. Use this when you don't care if the delete works.
+   *
+   * @param option
+   */
+  public void deleteInBackground(AVDeleteOption option) {
+    deleteInBackground(option, null);
+  }
+
+  /**
+   * Deletes this object on the server in a background thread. Does nothing in particular when the
+   * save completes. Use this when you don't care if the delete works.
+   *
+   * @param option
+   * @param callback
+   */
+  public void deleteInBackground(AVDeleteOption option, DeleteCallback callback) {
+    delete(false, false, option, callback);
   }
 
   /**
@@ -657,12 +690,28 @@ public class AVObject implements Parcelable {
    * @param callback callback.done(e) is called when the save completes.
    */
   public void deleteInBackground(DeleteCallback callback) {
-    delete(false, false, callback);
+    delete(false, false, null, callback);
   }
 
-  private void delete(boolean sync, boolean isEventually, DeleteCallback callback) {
+  private void delete(boolean sync, boolean isEventually, AVDeleteOption option, DeleteCallback callback) {
     final DeleteCallback internalCallback = callback;
-    PaasClient.storageInstance().deleteObject(AVPowerfulUtils.getEndpoint(this), sync,
+    String url = AVPowerfulUtils.getEndpoint(this);
+    Map<String, String> params = null;
+    if (option != null && option.matchQuery != null) {
+      if (this.getClassName() != null && !this.getClassName().equals(option.matchQuery.getClassName())) {
+        callback.internalDone(new AVException(0, "AVObject class inconsistant with AVQuery in AVDeleteOption"));
+        return;
+      }
+      Map<String, Object> whereOperationMap = null;
+      whereOperationMap = option.matchQuery.conditions.compileWhereOperationMap();
+      Map<String, Object> whereMap = new HashMap<>();
+      if ((whereOperationMap != null && !whereOperationMap.isEmpty())) {
+        whereMap.put("where", whereOperationMap);
+      }
+      url = AVUtils.addQueryParams(url, whereMap);
+    }
+
+    PaasClient.storageInstance().deleteObject(url, sync,
         isEventually, new GenericObjectCallback() {
           @Override
           public void onSuccess(String content, AVException e) {

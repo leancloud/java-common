@@ -3,8 +3,9 @@ package com.avos.avoscloud.internal.impl;
 import com.avos.avoscloud.AVCallback;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVUtils;
+import com.avos.avoscloud.internal.InternalCallback;
 
-public class DefaultInternalCallback {
+public class DefaultInternalCallback implements InternalCallback {
   public static DefaultInternalCallback instance() {
     synchronized (DefaultAppConfiguration.class) {
       if (instance == null) {
@@ -16,7 +17,18 @@ public class DefaultInternalCallback {
 
   private static DefaultInternalCallback instance;
 
-  public void internalDone0(AVCallback parent, Object t, AVException e) {
+  @Override
+  public boolean isMainThread() {
+    return true;
+  }
+
+  @Override
+  public void internalDoneInMainThread(AVCallback parent, Object t, AVException e) {
+    AVUtils.callCallback(parent, t, e);
+  }
+
+  @Override
+  public void internalDoneInCurrentThread(AVCallback parent, Object t, AVException e) {
     AVUtils.callCallback(parent, t, e);
   }
 }
