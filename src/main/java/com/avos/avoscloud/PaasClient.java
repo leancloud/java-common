@@ -156,7 +156,8 @@ public class PaasClient {
         .getAppConfiguration().applicationId);
     builder.header("Accept", defaultContentType);
     builder.header("Content-Type", defaultContentType);
-    builder.header("User-Agent", InternalConfigurationController.globalInstance().getClientConfiguration().getUserAgent());
+    builder.header("User-Agent", InternalConfigurationController.globalInstance()
+        .getClientConfiguration().getUserAgent());
     builder.header("X-LC-Sign", signRequest());
 
 
@@ -212,6 +213,14 @@ public class PaasClient {
     InternalConfigurationController.globalInstance().getAppConfiguration()
         .setStorageType(AppConfiguration.StorageType.StorageTypeS3);
     switchPushRouter("useAVOSCloudUS");
+  }
+
+  protected static void updateAPIServerWhenCN(String apiServer) {
+    if (isCN) {
+      InternalConfigurationController.globalInstance().getAppConfiguration().setBaseUrl(apiServer);
+      InternalConfigurationController.globalInstance().getAppConfiguration()
+          .configureService(AVOSServices.STORAGE_SERVICE.toString(), apiServer);
+    }
   }
 
   public static void useAVCloudCN() {
@@ -870,7 +879,7 @@ public class PaasClient {
     public static final MediaType JSON = MediaType.parse(defaultContentType);
 
     public AVHttpClient() {
-      client = new OkHttpClient();      
+      client = new OkHttpClient();
       client.setCookieHandler(cookieHandler);
       client.interceptors().addAll(
           InternalConfigurationController.globalInstance().getClientConfiguration()

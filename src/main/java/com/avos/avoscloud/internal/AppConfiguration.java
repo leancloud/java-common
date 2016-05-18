@@ -7,6 +7,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import com.avos.avoscloud.AVOSServices;
 import com.avos.avoscloud.AVUtils;
+import com.avos.avoscloud.AppRouterManager;
 
 public abstract class AppConfiguration {
 
@@ -19,7 +20,8 @@ public abstract class AppConfiguration {
       .synchronizedMap(new HashMap<String, String>());
 
   static {
-    serviceHostMap.put(AVOSServices.STORAGE_SERVICE.toString(), "https://api.leancloud.cn");
+    serviceHostMap.put(AVOSServices.STORAGE_SERVICE.toString(), AppRouterManager.getInstance()
+        .getAPIServer());
   }
 
   public enum StorageType {

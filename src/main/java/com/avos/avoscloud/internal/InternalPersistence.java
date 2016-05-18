@@ -33,6 +33,10 @@ public interface InternalPersistence {
 
   public Integer getPersistentSettingInteger(String keyzone, String key, Integer defaultValue);
 
+  public Long getPersistentSettingLong(String keyzone, String key, Long defaultValue);
+
+  public void savePersistentSettingLong(String keyzone, String key, Long value);
+
   public void savePersistentSettingString(String keyzone, String key, String value);
 
   public String getPersistentSettingString(String keyzone, String key, String defaultValue);
@@ -46,6 +50,6 @@ public interface InternalPersistence {
   public String getAVFileCachePath();
 
   public File getAVFileCacheFile(String url);
-  
+
   public void cleanAVFileCache(int days);
 }

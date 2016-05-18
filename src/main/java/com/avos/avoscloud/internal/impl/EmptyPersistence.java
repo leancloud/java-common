@@ -70,7 +70,7 @@ public class EmptyPersistence implements InternalPersistence {
 
   @Override
   public boolean getPersistentSettingBoolean(String keyzone, String key, Boolean defaultValue) {
-    return false;
+    return defaultValue;
   }
 
   @Override
@@ -80,7 +80,7 @@ public class EmptyPersistence implements InternalPersistence {
 
   @Override
   public Integer getPersistentSettingInteger(String keyzone, String key, Integer defaultValue) {
-    return null;
+    return defaultValue;
   }
 
   @Override
@@ -90,7 +90,7 @@ public class EmptyPersistence implements InternalPersistence {
 
   @Override
   public String getPersistentSettingString(String keyzone, String key, String defaultValue) {
-    return null;
+    return defaultValue;
   }
 
   @Override
@@ -100,7 +100,7 @@ public class EmptyPersistence implements InternalPersistence {
 
   @Override
   public String removePersistentSettingString(String keyzone, String key, String defaultValue) {
-    return null;
+    return defaultValue;
   }
 
   @Override
@@ -130,6 +130,16 @@ public class EmptyPersistence implements InternalPersistence {
 
   @Override
   public void cleanAVFileCache(int days) {
-    
+
+  }
+
+  @Override
+  public Long getPersistentSettingLong(String keyzone, String key, Long defaultValue) {
+    return defaultValue;
+  }
+
+  @Override
+  public void savePersistentSettingLong(String keyzone, String key, Long value) {
+
   }
 }

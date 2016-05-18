@@ -17,8 +17,8 @@ public abstract class InternalLogger {
   public void setDebugEnabled(boolean enable) {
     enabled = enable;
   }
-  
-  public boolean showInternalDebugLog(){
+
+  public boolean showInternalDebugLog() {
     return false;
   }
 
