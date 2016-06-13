@@ -11,6 +11,7 @@ import com.avos.avoscloud.internal.impl.DefaultAppConfiguration;
 import com.avos.avoscloud.internal.impl.DefaultClientConfiguration;
 import com.avos.avoscloud.internal.impl.DefaultInternalCacheImpementation;
 import com.avos.avoscloud.internal.impl.DefaultInternalCallback;
+import com.avos.avoscloud.internal.impl.DefaultInternalRequestSign;
 import com.avos.avoscloud.internal.impl.EmptyLogger;
 import com.avos.avoscloud.internal.impl.EmptyPersistence;
 
@@ -29,6 +30,7 @@ public class InternalConfigurationController {
   private InternalCallback internalCallback;
   private InternalLogger internalLogger;
   private InternalPersistence internalPersistence;
+  private InternalRequestSign internalRequestSign;
 
   private Class<? extends InternalFileDownloader> downloadImplementation;
 
@@ -115,6 +117,15 @@ public class InternalConfigurationController {
 
   public void setDownloaderImplementation(Class<? extends InternalFileDownloader> clazz) {
     this.downloadImplementation = clazz;
+  }
+
+  public InternalRequestSign getInternalRequestSign() {
+    return internalRequestSign == null ? DefaultInternalRequestSign.instance()
+        : internalRequestSign;
+  }
+
+  public void setInternalRequestSign(InternalRequestSign internalRequestSign) {
+    this.internalRequestSign = internalRequestSign;
   }
 
 

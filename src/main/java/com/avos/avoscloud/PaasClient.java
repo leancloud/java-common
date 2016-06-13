@@ -130,19 +130,6 @@ public class PaasClient {
     useUruluServer();
   }
 
-  private String signRequest() {
-    StringBuilder builder = new StringBuilder();
-    long ts = AVUtils.getCurrentTimestamp();
-    StringBuilder result = new StringBuilder();
-    result.append(AVUtils.md5(
-        builder
-            .append(ts)
-            .append(
-                InternalConfigurationController.globalInstance().getAppConfiguration().clientKey)
-            .toString()).toLowerCase());
-    return result.append(',').append(ts).toString();
-  }
-
   protected void updateHeaders(Request.Builder builder, Map<String, String> header,
       boolean needRequestStatistic) {
     // if the field isnt exist, the server will assume it's true
@@ -158,7 +145,7 @@ public class PaasClient {
     builder.header("Content-Type", defaultContentType);
     builder.header("User-Agent", InternalConfigurationController.globalInstance()
         .getClientConfiguration().getUserAgent());
-    builder.header("X-LC-Sign", signRequest());
+    builder.header("X-LC-Sign", InternalConfigurationController.globalInstance().getInternalRequestSign().requestSign());
 
 
     if (header != null) {

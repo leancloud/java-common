@@ -1,14 +1,10 @@
 package com.avos.avoscloud.internal.impl;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.avos.avoscloud.LogUtil;
 import com.avos.avoscloud.internal.InternalClientConfiguration;
 import com.avos.avoscloud.okhttp.Interceptor;
-import com.avos.avoscloud.okhttp.Request;
-import com.avos.avoscloud.okhttp.Response;
 
 public class DefaultClientConfiguration extends InternalClientConfiguration {
   List<Interceptor> clientInterceptors = new LinkedList<>();
