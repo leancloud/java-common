@@ -2,6 +2,7 @@ package com.avos.avoscloud.internal.impl;
 
 import java.io.File;
 
+import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.internal.InternalPersistence;
 
 public class EmptyPersistence implements InternalPersistence {
@@ -141,5 +142,15 @@ public class EmptyPersistence implements InternalPersistence {
   @Override
   public void savePersistentSettingLong(String keyzone, String key, Long value) {
 
+  }
+
+  @Override
+  public void setCurrentUser(AVUser user, boolean clean) {
+
+  }
+
+  @Override
+  public <T extends AVUser> T getCurrentUser(Class<T> userClass) {
+    return null;
   }
 }

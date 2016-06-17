@@ -55,7 +55,6 @@ public class PaasClient {
 
   public static final String sdkVersion = "v3.13-SNAPSHOT";
 
-  private AVUser currentUser = null;
   private AVACL defaultACL;
 
   private volatile AVHttpClient httpClient;
@@ -107,10 +106,6 @@ public class PaasClient {
     defaultACL = acl;
   }
 
-  AVUser getCurrentUser() {
-    return currentUser;
-  }
-
   public Map<String, String> userHeaderMap() {
     AVUser user = AVUser.getCurrentUser();
     if (user != null) {
@@ -118,11 +113,6 @@ public class PaasClient {
     }
     return null;
   }
-
-  void setCurrentUser(AVUser user) {
-    currentUser = user;
-  }
-
 
   private PaasClient() {
     apiVersion = "1.1";

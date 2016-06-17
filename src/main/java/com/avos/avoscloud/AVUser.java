@@ -32,18 +32,6 @@ public class AVUser extends AVObject {
   public static final String SESSION_TOKEN_KEY = "sessionToken";
   private static Class<? extends AVUser> subClazz;
 
-  static private File currentUserArchivePath() {
-    File file =
-        new File(InternalConfigurationController.globalInstance().getInternalPersistence()
-            .getPaasDocumentDir()
-            + "/currentUser");
-    return file;
-  }
-
-  static private boolean userArchiveExist() {
-    return currentUserArchivePath().exists();
-  }
-
   // getter/setter for fastjson
   public String getFacebookToken() {
     return facebookToken;
@@ -129,30 +117,8 @@ public class AVUser extends AVObject {
     if (newUser != null) {
       newUser.password = null;
     }
-    File currentUserArchivePath = currentUserArchivePath();
-    if (newUser != null && save) {
-      try {
-        newUser.lock.readLock().lock();
-        // Serialize the whole user
-        String jsonString =
-            JSON.toJSONString(newUser, ObjectValueFilter.instance,
-                SerializerFeature.WriteClassName, SerializerFeature.DisableCircularReferenceDetect);
-        if (InternalConfigurationController.globalInstance().getInternalLogger().isDebugEnabled()) {
-          LogUtil.log.d(jsonString);
-        }
-        InternalConfigurationController.globalInstance().getInternalPersistence()
-            .saveContentToFile(jsonString, currentUserArchivePath);
-
-      } catch (Exception e) {
-        LogUtil.log.e(LOG_TAG, "", e);
-      } finally {
-        newUser.lock.readLock().unlock();
-      }
-    } else if (save) {
-      InternalConfigurationController.globalInstance().getInternalPersistence()
-          .deleteFile(currentUserArchivePath);
-    }
-    PaasClient.storageInstance().setCurrentUser(newUser);
+    InternalConfigurationController.globalInstance().getInternalPersistence()
+        .setCurrentUser(newUser, save);
   }
 
   /**
@@ -174,44 +140,9 @@ public class AVUser extends AVObject {
    */
   @SuppressWarnings("unchecked")
   public static <T extends AVUser> T getCurrentUser(Class<T> userClass) {
-    T user = (T) PaasClient.storageInstance().getCurrentUser();
-    if (user != null) {
-      if (!userClass.isAssignableFrom(user.getClass())) {
-        user = AVUser.cast(user, userClass);
-      }
-    } else if (AVUser.userArchiveExist() && AVUtils.isAndroid()) {
-      synchronized (AVUser.class) {
-        String jsonString =
-            InternalConfigurationController.globalInstance().getInternalPersistence()
-                .readContentFromFile(currentUserArchivePath());
-        if (jsonString != null) {
-          if (jsonString.indexOf("@type") > 0) {
-            try {
-              // Wrap it in deserializing to avoid adding extra
-              // pending
-              // keys.
-              AVUser savedUser = (AVUser) JSON.parse(jsonString);
-              if (!userClass.isAssignableFrom(savedUser.getClass())) {
-                user = AVUser.cast(savedUser, userClass);
-              } else {
-                user = (T) savedUser;
-              }
-              // 这里要回写到PaasClient里面去
-              PaasClient.storageInstance().setCurrentUser(user);
-            } catch (Exception e) {
-              LogUtil.log.e(LOG_TAG, jsonString, e);
-            }
-          } else {
-            // oldest format
-            T userObject = newAVUser(userClass, null);
-            AVUtils.copyPropertiesFromJsonStringToAVObject(jsonString, userObject);
-            // update it to new format
-            changeCurrentUser(userObject, true);
-            user = userObject;
-          }
-        }
-      }
-    }
+    T user =
+        InternalConfigurationController.globalInstance().getInternalPersistence()
+            .getCurrentUser(userClass);
     if (enableAutomatic && user == null) {
       user = newAVUser(userClass, null);
       AVUser.changeCurrentUser(user, false);;

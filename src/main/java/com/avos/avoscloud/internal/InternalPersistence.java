@@ -2,6 +2,8 @@ package com.avos.avoscloud.internal;
 
 import java.io.File;
 
+import com.avos.avoscloud.AVUser;
+
 public interface InternalPersistence {
   public File getPaasDocumentDir();
 
@@ -52,4 +54,8 @@ public interface InternalPersistence {
   public File getAVFileCacheFile(String url);
 
   public void cleanAVFileCache(int days);
+
+  public void setCurrentUser(AVUser user, boolean clean);
+
+  public <T extends AVUser> T getCurrentUser(Class<T> userClass);
 }
