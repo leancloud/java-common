@@ -14,7 +14,6 @@ public abstract class AppConfiguration {
   public String applicationId;
   public String clientKey;
   protected StorageType storageType = StorageType.StorageTypeQiniu;
-  protected String baseUrl = "https://api.leancloud.cn";
 
   protected static Map<String, String> serviceHostMap = Collections
       .synchronizedMap(new HashMap<String, String>());
@@ -34,15 +33,6 @@ public abstract class AppConfiguration {
 
   public StorageType getStorageType() {
     return this.storageType;
-  }
-
-  public String getBaseUrl() {
-    return this.baseUrl;
-  }
-
-  public void setBaseUrl(String url) {
-    this.baseUrl = url;
-    serviceHostMap.put(AVOSServices.STORAGE_SERVICE.toString(), url);
   }
 
   public String getService(String service) {

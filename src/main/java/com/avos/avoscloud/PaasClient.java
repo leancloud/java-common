@@ -60,6 +60,7 @@ public class PaasClient {
   private volatile AVHttpClient httpClient;
   private static boolean lastModifyEnabled = false;
   private static String REQUEST_STATIS_HEADER = "X-Android-RS";
+  private String baseUrl;
 
   static HashMap<String, PaasClient> serviceClientMap = new HashMap<String, PaasClient>();
   static Map<String, AVObjectReferenceCount> internalObjectsForEventuallySave = Collections
@@ -116,7 +117,6 @@ public class PaasClient {
 
   private PaasClient() {
     apiVersion = "1.1";
-
     useUruluServer();
   }
 
@@ -135,7 +135,8 @@ public class PaasClient {
     builder.header("Content-Type", defaultContentType);
     builder.header("User-Agent", InternalConfigurationController.globalInstance()
         .getClientConfiguration().getUserAgent());
-    builder.header("X-LC-Sign", InternalConfigurationController.globalInstance().getInternalRequestSign().requestSign());
+    builder.header("X-LC-Sign", InternalConfigurationController.globalInstance()
+        .getInternalRequestSign().requestSign());
 
 
     if (header != null) {
@@ -186,7 +187,7 @@ public class PaasClient {
   public static void useAVCloudUS() {
     isCN = false;
     InternalConfigurationController.globalInstance().getAppConfiguration()
-        .setBaseUrl("https://us-api.leancloud.cn");
+        .configureService(AVOSServices.STORAGE_SERVICE.toString(), "https://us-api.leancloud.cn");
     InternalConfigurationController.globalInstance().getAppConfiguration()
         .setStorageType(AppConfiguration.StorageType.StorageTypeS3);
     switchPushRouter("useAVOSCloudUS");
@@ -194,7 +195,8 @@ public class PaasClient {
 
   protected static void updateAPIServerWhenCN(String apiServer) {
     if (isCN) {
-      InternalConfigurationController.globalInstance().getAppConfiguration().setBaseUrl(apiServer);
+      InternalConfigurationController.globalInstance().getAppConfiguration()
+          .configureService(AVOSServices.STORAGE_SERVICE.toString(), apiServer);
       InternalConfigurationController.globalInstance().getAppConfiguration()
           .configureService(AVOSServices.STORAGE_SERVICE.toString(), apiServer);
     }
@@ -202,7 +204,7 @@ public class PaasClient {
 
   public static void useAVCloudCN() {
     InternalConfigurationController.globalInstance().getAppConfiguration()
-        .setBaseUrl("https://api.leancloud.cn");
+        .configureService(AVOSServices.STORAGE_SERVICE.toString(), "https://api.leancloud.cn");
     InternalConfigurationController.globalInstance().getAppConfiguration()
         .setStorageType(AppConfiguration.StorageType.StorageTypeQiniu);
     switchPushRouter("useAVOSCloudCN");
@@ -210,14 +212,13 @@ public class PaasClient {
 
   public static void useLocalStg() {
     InternalConfigurationController.globalInstance().getAppConfiguration()
-        .setBaseUrl("https://cn-stg1.avoscloud.com");
+        .configureService(AVOSServices.STORAGE_SERVICE.toString(), "https://cn-stg1.avoscloud.com");
     InternalConfigurationController.globalInstance().getAppConfiguration()
         .setStorageType(AppConfiguration.StorageType.StorageTypeQiniu);
   }
 
   public String buildUrl(final String path) {
-    return String.format("%s/%s/%s", InternalConfigurationController.globalInstance()
-        .getAppConfiguration().getBaseUrl(), apiVersion, path);
+    return String.format("%s/%s/%s", this.baseUrl, apiVersion, path);
   }
 
   public String buildUrl(final String path, AVRequestParams params) {
@@ -231,8 +232,7 @@ public class PaasClient {
   }
 
   private String batchUrl() {
-    return String.format("%s/%s/batch", InternalConfigurationController.globalInstance()
-        .getAppConfiguration().getBaseUrl(), apiVersion);
+    return String.format("%s/%s/batch", this.baseUrl, apiVersion);
   }
 
   private String batchSaveRelativeUrl() {
@@ -256,11 +256,11 @@ public class PaasClient {
   }
 
   public void setBaseUrl(final String url) {
-    InternalConfigurationController.globalInstance().getAppConfiguration().setBaseUrl(url);
+    this.baseUrl = url;
   }
 
   public String getBaseUrl() {
-    return InternalConfigurationController.globalInstance().getAppConfiguration().getBaseUrl();
+    return this.baseUrl;
   }
 
   protected static void setServiceHost(AVOSServices service, String host) {
