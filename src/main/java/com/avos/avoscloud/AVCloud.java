@@ -116,6 +116,9 @@ public class AVCloud {
   // TODO: should be private
   public static Object convertCloudResponse(String response) {
     Object newResultValue = null;
+    if(AVUtils.isBlankString(response)){
+      return null;
+    }
     try {
       Map<String, ?> resultMap = AVUtils.getFromJSON(response, Map.class);
       Object resultValue = resultMap.get("result");
