@@ -387,6 +387,12 @@ public class AVUtils {
   }
 
   private static Map<String, Object> mapFromAVObject(AVObject object, boolean topObject) {
+    return mapFromAVObject(object, topObject, false);
+  }
+
+  private static Map<String, Object> mapFromAVObject(AVObject object, boolean topObject,
+      boolean instanceValue) {
+
     Map<String, Object> result = new HashMap<String, Object>();
     result.put("className", object.internalClassName());
 
@@ -395,10 +401,17 @@ public class AVUtils {
     }
     if (!topObject) {
       result.put("__type", "Pointer");
-    } else {
+    } else if(!instanceValue) {
       result.put("__type", "Object");
 
       Map<String, Object> serverData = getParsedMap(object.serverData, false);
+      if (serverData != null && !serverData.isEmpty()) {
+        result.putAll(serverData);
+      }
+    }else {
+      result.put("__type", "Object");
+
+      Map<String, Object> serverData = getParsedMap(object.instanceData, false);
       if (serverData != null && !serverData.isEmpty()) {
         result.putAll(serverData);
       }
@@ -685,6 +698,10 @@ public class AVUtils {
   }
 
   public static Object getParsedObject(Object object, boolean topObject) {
+    return getParsedObject(object, topObject, false);
+  }
+
+  public static Object getParsedObject(Object object, boolean topObject, boolean isntanceValue) {
     if (object == null) {
       return null;
     } else if (object instanceof Map) {
@@ -694,8 +711,10 @@ public class AVUtils {
     } else if (object instanceof AVObject) {
       if (!topObject) {
         return mapFromPointerObject((AVObject) object);
-      } else {
+      } else if (!isntanceValue) {
         return mapFromAVObject((AVObject) object, true);
+      } else {
+        return mapFromAVObject((AVObject)object, true, true);
       }
     } else if (object instanceof AVGeoPoint) {
       return mapFromGeoPoint((AVGeoPoint) object);
