@@ -392,6 +392,11 @@ public class AVUtils {
 
   private static Map<String, Object> mapFromAVObject(AVObject object, boolean topObject,
       boolean instanceValue) {
+    return mapFromAVObject(object, topObject, instanceValue, false);
+  }
+
+  private static Map<String, Object> mapFromAVObject(AVObject object, boolean topObject,
+      boolean instanceValue, boolean withDate) {
 
     Map<String, Object> result = new HashMap<String, Object>();
     result.put("className", object.internalClassName());
@@ -401,14 +406,14 @@ public class AVUtils {
     }
     if (!topObject) {
       result.put("__type", "Pointer");
-    } else if(!instanceValue) {
+    } else if (!instanceValue) {
       result.put("__type", "Object");
 
       Map<String, Object> serverData = getParsedMap(object.serverData, false);
       if (serverData != null && !serverData.isEmpty()) {
         result.putAll(serverData);
       }
-    }else {
+    } else {
       result.put("__type", "Object");
 
       Map<String, Object> serverData = getParsedMap(object.instanceData, false);
@@ -416,33 +421,51 @@ public class AVUtils {
         result.putAll(serverData);
       }
     }
+    if (withDate) {
+      if (object.getCreatedAt() != null) {
+        result.put(AVObject.CREATED_AT, object.createdAt);
+      }
+      if (object.getUpdatedAt() != null) {
+        result.put(AVObject.UPDATED_AT, object.updatedAt);
+      }
+    }
     return result;
   }
 
-  private static List getParsedList(Collection object, boolean topObject) {
+  private static List getParsedList(Collection object, boolean topObject, boolean instanceValue,
+      boolean withDate) {
     if (!topObject) {
       return getParsedList(object);
     } else {
       List newList = new ArrayList(object.size());
 
       for (Object o : object) {
-        newList.add(getParsedObject(o, true));
+        newList.add(getParsedObject(o, true, instanceValue, withDate));
       }
 
       return newList;
     }
   }
 
-  private static Map<String, Object> getParsedMap(Map<String, Object> object, boolean topObject) {
+  private static List getParsedList(Collection object, boolean topObject) {
+    return getParsedList(object, topObject, false, false);
+  }
+
+  private static Map<String, Object> getParsedMap(Map<String, Object> object, boolean topObject,
+      boolean instanceData, boolean withDate) {
     Map newMap = new HashMap<String, Object>(object.size());
 
     for (Map.Entry<String, Object> entry : object.entrySet()) {
       final String key = entry.getKey();
       Object o = entry.getValue();
-      newMap.put(key, getParsedObject(o, topObject));
+      newMap.put(key, getParsedObject(o, topObject, instanceData, withDate));
     }
 
     return newMap;
+  }
+
+  private static Map<String, Object> getParsedMap(Map<String, Object> object, boolean topObject) {
+    return getParsedMap(object, topObject, false, false);
   }
 
   public static boolean hasProperty(Class<?> clazz, String property) {
@@ -701,20 +724,25 @@ public class AVUtils {
     return getParsedObject(object, topObject, false);
   }
 
-  public static Object getParsedObject(Object object, boolean topObject, boolean isntanceValue) {
+  public static Object getParsedObject(Object object, boolean topObject, boolean instanceValue) {
+    return getParsedObject(object, topObject, instanceValue, false);
+  }
+
+  public static Object getParsedObject(Object object, boolean topObject, boolean instanceValue,
+      boolean withDate) {
     if (object == null) {
       return null;
     } else if (object instanceof Map) {
-      return getParsedMap((Map<String, Object>) object, topObject);
+      return getParsedMap((Map<String, Object>) object, topObject, instanceValue, withDate);
     } else if (object instanceof Collection) {
-      return getParsedList((Collection) object, topObject);
+      return getParsedList((Collection) object, topObject, instanceValue, withDate);
     } else if (object instanceof AVObject) {
       if (!topObject) {
         return mapFromPointerObject((AVObject) object);
-      } else if (!isntanceValue) {
-        return mapFromAVObject((AVObject) object, true);
+      } else if (!instanceValue) {
+        return mapFromAVObject((AVObject) object, true, false, withDate);
       } else {
-        return mapFromAVObject((AVObject)object, true, true);
+        return mapFromAVObject((AVObject) object, true, true);
       }
     } else if (object instanceof AVGeoPoint) {
       return mapFromGeoPoint((AVGeoPoint) object);
