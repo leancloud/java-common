@@ -80,7 +80,7 @@ public class GetHttpResponseHandler extends AsyncHttpResponseHandler {
     int code = AVErrorUtils.errorCode(content);
     if (code > 0) {
       if (getCallback() != null) {
-        getCallback().onFailure(AVErrorUtils.createException(code, content), content);
+        getCallback().onFailure(AVErrorUtils.createException(content), content);
       }
       return;
     }
