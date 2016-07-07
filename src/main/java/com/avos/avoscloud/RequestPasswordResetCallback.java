@@ -33,7 +33,7 @@ public abstract class RequestPasswordResetCallback extends AVCallback<Void> {
    * Override this function with the code you want to run after the request is complete.
    * 
    * @param e The exception raised by the save, or null if no account is associated with the email
-   *          address.
+   *        address.
    */
   public abstract void done(AVException e);
 

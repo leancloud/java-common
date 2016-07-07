@@ -45,7 +45,9 @@ public class LogUtil {
         .getInternalLogger();
 
     private static boolean shouldShow(int tag_level) {
-      return show && ((tag_level & InternalConfigurationController.globalInstance().getInternalLogger().getLogLevel()) > 0);
+      return show
+          && ((tag_level & InternalConfigurationController.globalInstance().getInternalLogger()
+              .getLogLevel()) > 0);
     }
 
     protected static void getTrace() {

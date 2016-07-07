@@ -42,7 +42,8 @@ public class AVErrorUtils {
       JSONObject object = new JSONObject(content);
       code = object.getInt("code");
       return code;
-    } catch (Exception exception) {}
+    } catch (Exception exception) {
+    }
     return code;
   }
 

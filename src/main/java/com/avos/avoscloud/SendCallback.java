@@ -41,6 +41,7 @@ public abstract class SendCallback extends com.avos.avoscloud.AVCallback<java.la
    */
   public abstract void done(com.avos.avoscloud.AVException e);
 
+  @Override
   protected final void internalDone0(java.lang.Void returnValue, com.avos.avoscloud.AVException e) {
     this.done(e);
   }

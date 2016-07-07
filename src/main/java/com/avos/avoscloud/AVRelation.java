@@ -1,7 +1,6 @@
 package com.avos.avoscloud;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -13,7 +12,7 @@ import com.alibaba.fastjson.annotation.JSONType;
  * of AVOSCloud.Relation is associated with a particular parent object and key.
  * </p>
  */
-@JSONType(ignores = {"query","parent"})
+@JSONType(ignores = {"query", "parent"})
 public class AVRelation<T extends AVObject> {
   private String key;
   private AVObject parent;
@@ -40,7 +39,8 @@ public class AVRelation<T extends AVObject> {
    * @param object The object to add to this relation.
    */
   public void add(T object) {
-    if (object == null) throw new IllegalArgumentException("null AVObject");
+    if (object == null)
+      throw new IllegalArgumentException("null AVObject");
     if (AVUtils.isBlankString(targetClass)) {
       targetClass = object.getClassName();
     }

@@ -10,9 +10,6 @@ import com.avos.avoscloud.okhttp.Response;
 import com.avos.avoscloud.FileUploader.ProgressCalculator;
 import com.avos.avoscloud.FileUploader.FileUploadProgressCallback;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -209,6 +206,7 @@ class QiniuUploader extends HttpClientUploader {
       this.parent = parent;
     }
 
+    @Override
     public void run() {
       QiniuBlockResponseData respBlockData;
       // 1.创建一个block,并且会上传第一个block的第一个chunk的数据

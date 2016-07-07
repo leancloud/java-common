@@ -4,8 +4,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.avos.avoscloud.AVObject;
-
 public abstract class BaseOp implements AVOp {
   protected String key;
   protected OpType type;
@@ -43,14 +41,17 @@ public abstract class BaseOp implements AVOp {
     this.type = type;
   }
 
+  @Override
   public String key() {
     return key;
   }
 
+  @Override
   public OpType type() {
     return this.type;
   }
 
+  @Override
   public <T extends AVOp> T cast(Class<T> clazz) {
     return clazz.cast(this);
   }

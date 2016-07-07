@@ -17,7 +17,8 @@ public class S3Uploader extends HttpClientUploader {
   private String uploadUrl;
   private AVFile parseFile;
 
-  S3Uploader(AVFile parseFile, String uploadUrl, SaveCallback saveCallback, ProgressCallback progressCallback) {
+  S3Uploader(AVFile parseFile, String uploadUrl, SaveCallback saveCallback,
+      ProgressCallback progressCallback) {
     super(saveCallback, progressCallback);
     this.uploadUrl = uploadUrl;
     this.parseFile = parseFile;
@@ -54,7 +55,8 @@ public class S3Uploader extends HttpClientUploader {
       if (2 != (response.code() / 100)) {
         serverResponse = AVUtils.stringFromBytes(response.body().bytes());
         LogUtil.avlog.e(serverResponse);
-        return AVErrorUtils.createException(AVException.OTHER_CAUSE, "upload file failure:" + response.code());
+        return AVErrorUtils.createException(AVException.OTHER_CAUSE, "upload file failure:"
+            + response.code());
       }
     } catch (Exception e) {
       return new AVException(e.getCause());

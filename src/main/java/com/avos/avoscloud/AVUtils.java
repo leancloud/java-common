@@ -1232,7 +1232,7 @@ public class AVUtils {
     }
     return String.format("%s?%s", path, URLEncodedUtils.format(pairs, "UTF-8"));
   }
-  
+
   protected static final int defaultFileKeyLength = 40;
 
   public static String parseFileKey(String fileName) {
@@ -1255,8 +1255,7 @@ public class AVUtils {
       int halfbyte = (b >>> 4) & 0x0F;
       int two_halfs = 0;
       do {
-        buf.append((0 <= halfbyte) && (halfbyte <= 9)
-            ? (char) ('0' + halfbyte)
+        buf.append((0 <= halfbyte) && (halfbyte <= 9) ? (char) ('0' + halfbyte)
             : (char) ('a' + (halfbyte - 10)));
         halfbyte = b & 0x0F;
       } while (two_halfs++ < 1);

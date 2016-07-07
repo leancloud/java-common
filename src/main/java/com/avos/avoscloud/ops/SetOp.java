@@ -3,7 +3,6 @@ package com.avos.avoscloud.ops;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVUtils;
 
 /**
@@ -19,6 +18,7 @@ public class SetOp extends BaseOp implements SingleValueOp {
     super();
   }
 
+  @Override
   public Object getValues() {
     return value;
   }
@@ -77,8 +77,8 @@ public class SetOp extends BaseOp implements SingleValueOp {
     }
   }
 
-    @Override
-    public void setValues(Object values) {
-        this.value = values;
-    }
+  @Override
+  public void setValues(Object values) {
+    this.value = values;
+  }
 }

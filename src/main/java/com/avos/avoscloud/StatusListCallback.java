@@ -15,6 +15,7 @@ public abstract class StatusListCallback extends AVCallback<java.util.List<AVSta
    */
   public abstract void done(List<AVStatus> statusObjects, AVException parseException);
 
+  @Override
   protected final void internalDone0(List<AVStatus> returnValue, AVException e) {
     done(returnValue, e);
   }

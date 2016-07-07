@@ -9,8 +9,8 @@ import com.avos.avoscloud.okio.Buffer;
  * Created by lbt05 on 9/17/15.
  */
 public class AVRequestParams {
-  private static final char[] HEX_DIGITS =
-  {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+  private static final char[] HEX_DIGITS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A',
+      'B', 'C', 'D', 'E', 'F'};
 
   static final String QUERY_COMPONENT_ENCODE_SET = " \"':;<=>@[]^`{}|/\\?#&!$(),~";
   HashMap<String, ParameterValuePair> params;
@@ -131,11 +131,8 @@ public class AVRequestParams {
     int codePoint;
     for (int i = pos; i < limit; i += Character.charCount(codePoint)) {
       codePoint = input.codePointAt(i);
-      if (codePoint < 0x20
-          || codePoint >= 0x7f
-          || encodeSet.indexOf(codePoint) != -1
-          || (codePoint == '%' && !alreadyEncoded)
-          || (query && codePoint == '+')) {
+      if (codePoint < 0x20 || codePoint >= 0x7f || encodeSet.indexOf(codePoint) != -1
+          || (codePoint == '%' && !alreadyEncoded) || (query && codePoint == '+')) {
         // Slow path: the character at i requires encoding!
         Buffer out = new Buffer();
         out.writeUtf8(input, pos, i);
@@ -148,8 +145,8 @@ public class AVRequestParams {
     return input.substring(pos, limit);
   }
 
-  static void canonicalize(Buffer out, String input, int pos, int limit,
-      String encodeSet, boolean alreadyEncoded, boolean query) {
+  static void canonicalize(Buffer out, String input, int pos, int limit, String encodeSet,
+      boolean alreadyEncoded, boolean query) {
     Buffer utf8Buffer = null; // Lazily allocated.
     int codePoint;
     for (int i = pos; i < limit; i += Character.charCount(codePoint)) {
@@ -160,9 +157,7 @@ public class AVRequestParams {
       } else if (query && codePoint == '+') {
         // HTML permits space to be encoded as '+'. We use '%20' to avoid special cases.
         out.writeUtf8(alreadyEncoded ? "%20" : "%2B");
-      } else if (codePoint < 0x20
-          || codePoint >= 0x7f
-          || encodeSet.indexOf(codePoint) != -1
+      } else if (codePoint < 0x20 || codePoint >= 0x7f || encodeSet.indexOf(codePoint) != -1
           || (codePoint == '%' && !alreadyEncoded)) {
         // Percent encode this character.
         if (utf8Buffer == null) {
@@ -182,8 +177,7 @@ public class AVRequestParams {
     }
   }
 
-  static String canonicalize(
-      String input, String encodeSet, boolean alreadyEncoded, boolean query) {
+  static String canonicalize(String input, String encodeSet, boolean alreadyEncoded, boolean query) {
     return canonicalize(input, 0, input.length(), encodeSet, alreadyEncoded, query);
   }
 }

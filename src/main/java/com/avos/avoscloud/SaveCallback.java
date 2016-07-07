@@ -36,6 +36,7 @@ public abstract class SaveCallback extends AVCallback<Void> {
    */
   public abstract void done(AVException e);
 
+  @Override
   protected final void internalDone0(java.lang.Void returnValue, AVException e) {
     done(e);
   }

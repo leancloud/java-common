@@ -3,11 +3,9 @@ package com.avos.avoscloud;
 import android.os.Parcel;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.annotation.JSONType;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
-import java.lang.annotation.ElementType;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -843,7 +841,7 @@ public class AVStatus extends AVObject {
     }
 
     if (query == null) {
-      AVStatus.sendStatusToFollowersInBackgroud(sync,this, callback);
+      AVStatus.sendStatusToFollowersInBackgroud(sync, this, callback);
       return;
     }
 

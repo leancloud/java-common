@@ -3,16 +3,15 @@ package com.avos.avoscloud.ops;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVUtils;
 
 public class AddUniqueOp extends CollectionAddOp {
   private Set<Object> values = new HashSet<Object>();
 
+  @Override
   public Set<Object> getValues() {
     return values;
   }
@@ -35,6 +34,7 @@ public class AddUniqueOp extends CollectionAddOp {
     return AVUtils.createArrayOpMap(key, this.type.name(), getParsedValues());
   }
 
+  @Override
   public Object apply(Object oldValue) {
     Set<Object> result = new HashSet<Object>();
     if (oldValue != null) {

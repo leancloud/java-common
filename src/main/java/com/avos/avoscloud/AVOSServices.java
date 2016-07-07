@@ -1,8 +1,7 @@
 package com.avos.avoscloud;
 
 public enum AVOSServices {
-  STORAGE_SERVICE("avoscloud-storage"), STATISTICS_SERVICE("avoscloud-statistics"),
-  FUNCTION_SERVICE(
+  STORAGE_SERVICE("avoscloud-storage"), STATISTICS_SERVICE("avoscloud-statistics"), FUNCTION_SERVICE(
       "avoscloud-function");
   private String service;
 
@@ -10,6 +9,7 @@ public enum AVOSServices {
     this.service = service;
   }
 
+  @Override
   public String toString() {
     return this.service;
   }

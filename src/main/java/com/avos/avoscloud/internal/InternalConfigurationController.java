@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import com.avos.avoscloud.AVUtils;
 import com.avos.avoscloud.GetDataCallback;
-import com.avos.avoscloud.LogUtil;
 import com.avos.avoscloud.ProgressCallback;
 import com.avos.avoscloud.internal.impl.DefaultAppConfiguration;
 import com.avos.avoscloud.internal.impl.DefaultClientConfiguration;

@@ -22,5 +22,5 @@ public abstract class InternalClientConfiguration {
 
   public void setNetworkTimeoutInMills(int timeout) {
     timeoutInMills = timeout;
-  }  
+  }
 }

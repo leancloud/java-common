@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.avos.avoscloud.AVObject;
-
 public class NullOP implements AVOp {
 
   public static NullOP INSTANCE = new NullOP();
@@ -67,7 +65,8 @@ public class NullOP implements AVOp {
     return null;
   }
 
-  public Object getValues(){
-      return null;
+  @Override
+  public Object getValues() {
+    return null;
   }
 }

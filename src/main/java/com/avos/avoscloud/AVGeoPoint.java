@@ -39,7 +39,8 @@ public class AVGeoPoint {
    */
   public double distanceInKilometersTo(AVGeoPoint point) {
     float[] mResults = new float[2];
-    computeDistanceAndBearing(this.latitude,this.longitude,point.latitude,point.longitude,mResults);
+    computeDistanceAndBearing(this.latitude, this.longitude, point.latitude, point.longitude,
+        mResults);
     return mResults[0] / 1000;
   }
 

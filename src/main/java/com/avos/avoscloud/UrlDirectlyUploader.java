@@ -10,7 +10,7 @@ class UrlDirectlyUploader extends HttpClientUploader {
   AVFile parseFile;
 
   protected UrlDirectlyUploader(AVFile parseFile, SaveCallback saveCallback,
-                                ProgressCallback progressCallback) {
+      ProgressCallback progressCallback) {
     super(saveCallback, progressCallback);
     this.parseFile = parseFile;
   }
@@ -21,29 +21,29 @@ class UrlDirectlyUploader extends HttpClientUploader {
     final AVException[] exceptionSaveFile = new AVException[1];
     PaasClient.storageInstance().postObject(AVPowerfulUtils.getEndpoint(parseFile),
 
-        getFileRequestParameters(), true, new GenericObjectCallback() {
-          @Override
-          public void onSuccess(String content, AVException e) {
-            if (e == null) {
-              try {
-                JSONObject jsonObject = new JSONObject(content);
-                parseFile.handleUploadedResponse(jsonObject.getString("objectId"),
-                    jsonObject.getString("objectId"), parseFile.getUrl());
-                publishProgress(100);
-              } catch (Exception ex) {
-                exceptionSaveFile[0] = new AVException(ex);
-              }
-            } else {
-              exceptionSaveFile[0] = AVErrorUtils.createException(e, content);
-            }
+    getFileRequestParameters(), true, new GenericObjectCallback() {
+      @Override
+      public void onSuccess(String content, AVException e) {
+        if (e == null) {
+          try {
+            JSONObject jsonObject = new JSONObject(content);
+            parseFile.handleUploadedResponse(jsonObject.getString("objectId"),
+                jsonObject.getString("objectId"), parseFile.getUrl());
+            publishProgress(100);
+          } catch (Exception ex) {
+            exceptionSaveFile[0] = new AVException(ex);
           }
+        } else {
+          exceptionSaveFile[0] = AVErrorUtils.createException(e, content);
+        }
+      }
 
-          @Override
-          public void onFailure(Throwable error, String content) {
-            exceptionSaveFile[0] = AVErrorUtils.createException(error, content);
-          }
+      @Override
+      public void onFailure(Throwable error, String content) {
+        exceptionSaveFile[0] = AVErrorUtils.createException(error, content);
+      }
 
-        });
+    });
 
     return exceptionSaveFile[0];
   }

@@ -1,8 +1,5 @@
 package com.avos.avoscloud.ops;
 
-import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.AVUtils;
-
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +17,7 @@ public abstract class CollectionAddOp extends CollectionOp {
     super(key, type);
   }
 
+  @Override
   public Object apply(Object oldValue) {
     List<Object> result = new LinkedList<Object>();
     if (oldValue != null) {

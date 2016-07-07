@@ -1,23 +1,18 @@
 package com.avos.avoscloud;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.DefaultJSONParser;
 import com.alibaba.fastjson.parser.JSONToken;
 import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
 import com.avos.avoscloud.internal.InternalConfigurationController;
 import com.avos.avoscloud.ops.AVOp;
-import com.avos.avoscloud.ops.AddOp;
 import com.avos.avoscloud.ops.AddRelationOp;
-import com.avos.avoscloud.ops.AddUniqueOp;
 import com.avos.avoscloud.ops.CollectionOp;
 import com.avos.avoscloud.ops.CompoundOp;
 import com.avos.avoscloud.ops.NullOP;
-import com.avos.avoscloud.ops.RemoveOp;
 import com.avos.avoscloud.ops.RemoveRelationOp;
-import com.avos.avoscloud.ops.SingleValueOp;
-
 import java.lang.reflect.Type;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -124,11 +119,12 @@ class AVObjectDeserializer implements ObjectDeserializer {
         Set<JSONObject> opValues = (Set<JSONObject>) op.getValues();
         Set<AVObject> objects = new HashSet<AVObject>();
         for (JSONObject o : opValues) {
-          AVObject object = JSONObject.parseObject(o.toString(), AVObject.class);
+          AVObject object = JSON.parseObject(o.toString(), AVObject.class);
           objects.add(object);
         }
         ((CollectionOp) op).setValues(objects);
-      } catch (Exception e) {}
+      } catch (Exception e) {
+      }
     }
     if (op instanceof CompoundOp) {
       List<AVOp> ops = (List<AVOp>) op.getValues();

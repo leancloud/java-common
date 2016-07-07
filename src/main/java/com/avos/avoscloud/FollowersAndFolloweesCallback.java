@@ -1,6 +1,5 @@
 package com.avos.avoscloud;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -8,8 +7,8 @@ import java.util.Map;
  * use File | Settings | File Templates.
  */
 
-public abstract class FollowersAndFolloweesCallback<T extends AVObject>
-    extends AVCallback<java.util.Map<String, T>> {
+public abstract class FollowersAndFolloweesCallback<T extends AVObject> extends
+    AVCallback<java.util.Map<String, T>> {
   /**
    * Override this function with the code you want to run after the fetch is complete.
    * 
@@ -18,6 +17,7 @@ public abstract class FollowersAndFolloweesCallback<T extends AVObject>
    */
   public abstract void done(Map<String, T> parseObjects, AVException parseException);
 
+  @Override
   protected final void internalDone0(Map<String, T> returnValue, AVException e) {
     done(returnValue, e);
   }

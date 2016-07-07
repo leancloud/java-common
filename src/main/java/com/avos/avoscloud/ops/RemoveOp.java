@@ -26,6 +26,7 @@ public class RemoveOp extends CollectionOp {
     super();
   }
 
+  @Override
   public Set<Object> getValues() {
     return values;
   }

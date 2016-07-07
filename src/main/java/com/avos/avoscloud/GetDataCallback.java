@@ -13,8 +13,7 @@ package com.avos.avoscloud;
  * 
  * <pre>
  * file.getDataInBackground(new GetDataCallback() {
- *   public void done(byte[] data, AVException e)
- *   {
+ *   public void done(byte[] data, AVException e) {
  *     // ...
  *   }
  * });
@@ -23,6 +22,7 @@ package com.avos.avoscloud;
 public abstract class GetDataCallback extends AVCallback<byte[]> {
   public abstract void done(byte[] data, AVException e);
 
+  @Override
   protected final void internalDone0(byte[] returnValue, AVException e) {
     done(returnValue, e);
   }

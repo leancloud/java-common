@@ -15,5 +15,5 @@ public interface InternalFileDownloader {
   public void setProgressCallback(ProgressCallback callback);
 
   public void setGetDataCallback(GetDataCallback callback);
-  
+
 }

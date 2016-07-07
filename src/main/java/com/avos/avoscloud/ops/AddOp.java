@@ -1,6 +1,5 @@
 package com.avos.avoscloud.ops;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +18,7 @@ public class AddOp extends CollectionAddOp {
     super(key, type);
   }
 
+  @Override
   public List<Object> getValues() {
     return values;
   }

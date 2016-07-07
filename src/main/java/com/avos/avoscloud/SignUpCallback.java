@@ -36,6 +36,7 @@ public abstract class SignUpCallback extends AVCallback<Void> {
    */
   public abstract void done(AVException e);
 
+  @Override
   protected final void internalDone0(Void t, AVException parseException) {
     this.done(parseException);
   }

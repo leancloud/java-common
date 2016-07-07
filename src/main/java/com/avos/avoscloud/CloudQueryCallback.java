@@ -6,8 +6,8 @@ package com.avos.avoscloud;
  * </p>
  */
 
-public abstract class CloudQueryCallback<T extends AVCloudQueryResult>
-    extends AVCallback<AVCloudQueryResult> {
+public abstract class CloudQueryCallback<T extends AVCloudQueryResult> extends
+    AVCallback<AVCloudQueryResult> {
   public abstract void done(AVCloudQueryResult result, AVException avException);
 
   @Override

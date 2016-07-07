@@ -2,7 +2,6 @@ package com.avos.avoscloud.ops;
 
 import java.util.Map;
 
-import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVUtils;
 
 /**
@@ -49,10 +48,12 @@ public class DeleteOp extends BaseOp {
     }
   }
 
+  @Override
   public Object getValues() {
     return null;
   }
 
+  @Override
   public Object apply(Object value) {
     return null;
   }

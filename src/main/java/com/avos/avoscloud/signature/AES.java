@@ -159,7 +159,8 @@ public class AES {
     int shortage = 16 - (plain.length % 16);
     // if already an exact multiple of 16, need to add another block of 16
     // bytes
-    if (shortage == 0) shortage = 16;
+    if (shortage == 0)
+      shortage = 16;
 
     // reallocate array bigger to be exact multiple, adding shortage bits.
     plainpad = new byte[plain.length + shortage];

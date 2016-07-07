@@ -504,7 +504,8 @@ public class AVObject implements Parcelable {
    * Deletes this object on the server. This does not delete or destroy the object locally.
    *
    * @param option options for server to
-   * @throws Exception AVException Throws an error if the object does not exist or if the internet fails.
+   * @throws Exception AVException Throws an error if the object does not exist or if the internet
+   *         fails.
    */
   public void delete(AVDeleteOption option) throws AVException {
     delete(true, false, option, new DeleteCallback() {
@@ -693,13 +694,16 @@ public class AVObject implements Parcelable {
     delete(false, false, null, callback);
   }
 
-  private void delete(boolean sync, boolean isEventually, AVDeleteOption option, DeleteCallback callback) {
+  private void delete(boolean sync, boolean isEventually, AVDeleteOption option,
+      DeleteCallback callback) {
     final DeleteCallback internalCallback = callback;
     String url = AVPowerfulUtils.getEndpoint(this);
     Map<String, String> params = null;
     if (option != null && option.matchQuery != null) {
-      if (this.getClassName() != null && !this.getClassName().equals(option.matchQuery.getClassName())) {
-        callback.internalDone(new AVException(0, "AVObject class inconsistant with AVQuery in AVDeleteOption"));
+      if (this.getClassName() != null
+          && !this.getClassName().equals(option.matchQuery.getClassName())) {
+        callback.internalDone(new AVException(0,
+            "AVObject class inconsistant with AVQuery in AVDeleteOption"));
         return;
       }
       Map<String, Object> whereOperationMap = null;
@@ -711,22 +715,21 @@ public class AVObject implements Parcelable {
       url = AVUtils.addQueryParams(url, whereMap);
     }
 
-    PaasClient.storageInstance().deleteObject(url, sync,
-        isEventually, new GenericObjectCallback() {
-          @Override
-          public void onSuccess(String content, AVException e) {
-            if (internalCallback != null) {
-              internalCallback.internalDone(null, null);
-            }
-          }
+    PaasClient.storageInstance().deleteObject(url, sync, isEventually, new GenericObjectCallback() {
+      @Override
+      public void onSuccess(String content, AVException e) {
+        if (internalCallback != null) {
+          internalCallback.internalDone(null, null);
+        }
+      }
 
-          @Override
-          public void onFailure(Throwable error, String content) {
-            if (internalCallback != null) {
-              internalCallback.internalDone(null, AVErrorUtils.createException(error, content));
-            }
-          }
-        }, this.getObjectId(), internalId());
+      @Override
+      public void onFailure(Throwable error, String content) {
+        if (internalCallback != null) {
+          internalCallback.internalDone(null, AVErrorUtils.createException(error, content));
+        }
+      }
+    }, this.getObjectId(), internalId());
   }
 
   public AVObject fetch() throws AVException {

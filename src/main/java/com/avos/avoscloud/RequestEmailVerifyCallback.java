@@ -16,16 +16,15 @@ package com.avos.avoscloud;
  * </p>
  * 
  * <pre>
- * AVUser.requestEmailVerfiyInBackground(&quot;forgetful@example.com&quot;,
- *     new RequestEmailVerifyCallback() {
- *       public void done(AVException e) {
- *         if (e == null) {
- *           requestedSuccessfully();
- *         } else {
- *           requestDidNotSucceed();
- *         }
- *       }
- *     });
+ * AVUser.requestEmailVerfiyInBackground(&quot;forgetful@example.com&quot;, new RequestEmailVerifyCallback() {
+ *   public void done(AVException e) {
+ *     if (e == null) {
+ *       requestedSuccessfully();
+ *     } else {
+ *       requestDidNotSucceed();
+ *     }
+ *   }
+ * });
  * </pre>
  */
 public abstract class RequestEmailVerifyCallback extends AVCallback<Void> {
@@ -33,7 +32,7 @@ public abstract class RequestEmailVerifyCallback extends AVCallback<Void> {
    * Override this function with the code you want to run after the request is complete.
    * 
    * @param e The exception raised by the save, or null if no account is associated with the email
-   *          address.
+   *        address.
    */
   public abstract void done(AVException e);
 

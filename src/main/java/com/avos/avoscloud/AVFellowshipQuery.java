@@ -5,9 +5,8 @@ import com.alibaba.fastjson.JSON;
 import java.util.*;
 
 /**
- * 这个类仅仅是作为单向好友关系查询的
- * Created with IntelliJ IDEA. User: zhuzeng Date: 1/26/14 Time: 11:28 AM To change this template
- * use File | Settings | File Templates.
+ * 这个类仅仅是作为单向好友关系查询的 Created with IntelliJ IDEA. User: zhuzeng Date: 1/26/14 Time: 11:28 AM To
+ * change this template use File | Settings | File Templates.
  */
 class AVFellowshipQuery<T extends AVUser> extends AVQuery<T> {
   private String friendshipTag;

@@ -28,23 +28,25 @@ class FileUploader extends HttpClientUploader {
   protected static final int defaultFileKeyLength = 40;
 
   protected FileUploader(AVFile parseFile, SaveCallback saveCallback,
-                         ProgressCallback progressCallback) {
+      ProgressCallback progressCallback) {
     super(saveCallback, progressCallback);
     this.parseFile = parseFile;
   }
 
+  @Override
   public AVException doWork() {
     // fileKey 是随机值，在 fileTokens 请求与真正的 upload 请求时都会用到，这里要保证是同一个值
     String fileKey = AVUtils.parseFileKey(parseFile.getName());
     if (AVUtils.isBlankString(uploadUrl)) {
-      AVException getBucketException = fetchUploadBucket("fileTokens", fileKey, true, new AVCallback<String>() {
-        @Override
-        protected void internalDone0(String s, AVException parseException) {
-          if (null == parseException) {
-            handleGetBucketResponse(s);
-          }
-        }
-      });
+      AVException getBucketException =
+          fetchUploadBucket("fileTokens", fileKey, true, new AVCallback<String>() {
+            @Override
+            protected void internalDone0(String s, AVException parseException) {
+              if (null == parseException) {
+                handleGetBucketResponse(s);
+              }
+            }
+          });
       if (getBucketException != null) {
         return getBucketException;
       }
@@ -67,7 +69,8 @@ class FileUploader extends HttpClientUploader {
   private Uploader getUploaderImplementation(String fileKey) {
     switch (provider) {
       case "qcloud":
-        return new QCloudUploader(parseFile, fileKey, token, uploadUrl, saveCallback, progressCallback);
+        return new QCloudUploader(parseFile, fileKey, token, uploadUrl, saveCallback,
+            progressCallback);
       case "s3":
         return new S3Uploader(parseFile, uploadUrl, saveCallback, progressCallback);
       default:
@@ -76,7 +79,8 @@ class FileUploader extends HttpClientUploader {
 
   }
 
-  private AVException fetchUploadBucket(String path, String fileKey, boolean sync, final AVCallback<String> callback) {
+  private AVException fetchUploadBucket(String path, String fileKey, boolean sync,
+      final AVCallback<String> callback) {
     final AVException[] exceptionWhenGetBucket = new AVException[1];
     PaasClient.storageInstance().postObject(path, getGetBucketParameters(fileKey), sync,
         new GenericObjectCallback() {
@@ -117,7 +121,7 @@ class FileUploader extends HttpClientUploader {
 
   private String getGetBucketParameters(String fileKey) {
     Map<String, Object> parameters = new HashMap<String, Object>(3);
-    parameters.put("key",  fileKey);
+    parameters.put("key", fileKey);
     parameters.put("name", parseFile.getName());
     parameters.put("mime_type", parseFile.mimeType());
     parameters.put("metaData", parseFile.getMetaData());
@@ -136,8 +140,7 @@ class FileUploader extends HttpClientUploader {
         fileObject.deleteInBackground(new DeleteCallback() {
 
           @Override
-          public void done(AVException e) {
-          }
+          public void done(AVException e) {}
         });
       } catch (Exception e) {
         // ignore

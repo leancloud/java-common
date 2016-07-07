@@ -266,8 +266,7 @@ public class QueryConditions {
   }
 
   public void addAndItems(QueryConditions conditions) {
-    Map<String, Object> queryOperationMap = conditions
-        .compileWhereOperationMap();
+    Map<String, Object> queryOperationMap = conditions.compileWhereOperationMap();
     QueryOperation op = new QueryOperation("$and", "$and", queryOperationMap);
 
     List<QueryOperation> ops = where.get(QueryOperation.AND_OP);
@@ -388,8 +387,7 @@ public class QueryConditions {
   }
 
 
-  public void whereWithinMiles(String key, AVGeoPoint point, double maxDistance,
-      double minDistance) {
+  public void whereWithinMiles(String key, AVGeoPoint point, double maxDistance, double minDistance) {
     Map<String, Object> map = AVUtils.createMap("$nearSphere", AVUtils.mapFromGeoPoint(point));
     if (maxDistance >= 0) {
       map.put("$maxDistanceInMiles", maxDistance);

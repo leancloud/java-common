@@ -9,16 +9,15 @@ package com.avos.avoscloud;
  * </p>
  * 
  * <pre>
- * AVUser.requestMobilePhoneVerifyInBackgroud(&quot;12345678901&quot;,
- *     new RequestMobileCodeCallback() {
- *       public void done(AVException e) {
- *         if (e == null) {
- *           requestedSuccessfully();
- *         } else {
- *           requestDidNotSucceed();
- *         }
- *       }
- *     });
+ * AVUser.requestMobilePhoneVerifyInBackgroud(&quot;12345678901&quot;, new RequestMobileCodeCallback() {
+ *   public void done(AVException e) {
+ *     if (e == null) {
+ *       requestedSuccessfully();
+ *     } else {
+ *       requestDidNotSucceed();
+ *     }
+ *   }
+ * });
  * </pre>
  */
 public abstract class RequestMobileCodeCallback extends AVCallback<Void> {

@@ -46,7 +46,7 @@ public class AVCloud {
    * 
    * @param name The cloud function to call
    * @param params The parameters to send to the cloud function. This map can contain anything that
-   *          could be placed in a AVObject except for AVObjects themselves.
+   *        could be placed in a AVObject except for AVObjects themselves.
    * @return The result of the cloud call. Result may be a @{link Map}< String, ?>, AVObject,
    *         List<?>, or any type that can be set as a field in a AVObject.
    * @throws AVException
@@ -66,7 +66,8 @@ public class AVCloud {
             AVExceptionHolder.add(AVErrorUtils.createException(error, content));
           }
         });
-    if (AVExceptionHolder.exists()) throw AVExceptionHolder.remove();
+    if (AVExceptionHolder.exists())
+      throw AVExceptionHolder.remove();
     return reference.get();
   }
 
@@ -75,7 +76,7 @@ public class AVCloud {
    * 
    * @param name The cloud function to call
    * @param params The parameters to send to the cloud function. This map can contain anything that
-   *          could be placed in a AVObject except for AVObjects themselves.
+   *        could be placed in a AVObject except for AVObjects themselves.
    * @param callback The callback that will be called when the cloud function has returned.
    */
   public static <T> void callFunctionInBackground(String name, Map<String, ?> params,
@@ -100,12 +101,10 @@ public class AVCloud {
   }
 
   /*
-   * response like this:
-   * {"result":"Hello world!"}
-   * { "result": { "__type": "Object", "className": "Armor", "createdAt":
-   * "2013-04-02T06:15:27.211Z", "displayName": "Wooden Shield", "fireproof": false, "objectId":
-   * "2iGGg18C7H", "rupees": 50, "updatedAt": "2013-04-02T06:15:27.211Z" } }
-   * { "result": [ { "__type": "Object", "cheatMode": false, "className": "Armor", "createdAt":
+   * response like this: {"result":"Hello world!"} { "result": { "__type": "Object", "className":
+   * "Armor", "createdAt": "2013-04-02T06:15:27.211Z", "displayName": "Wooden Shield", "fireproof":
+   * false, "objectId": "2iGGg18C7H", "rupees": 50, "updatedAt": "2013-04-02T06:15:27.211Z" } } {
+   * "result": [ { "__type": "Object", "cheatMode": false, "className": "Armor", "createdAt":
    * "2013-04-20T07:45:54.962Z", "objectId": "8o2ncpWitt", "otherArmor": { "__type": "Pointer",
    * "className": "Armor", "objectId": "dEvrhyRGcr" }, "playerName": "Sean Plott", "score": 1337,
    * "testBytes": { "__type": "Bytes", "base64": "VGhpcyBpcyBhbiBlbmNvZGVkIHN0cmluZw==" },
@@ -116,7 +115,7 @@ public class AVCloud {
   // TODO: should be private
   public static Object convertCloudResponse(String response) {
     Object newResultValue = null;
-    if(AVUtils.isBlankString(response)){
+    if (AVUtils.isBlankString(response)) {
       return null;
     }
     try {
@@ -160,15 +159,16 @@ public class AVCloud {
         return false;
       }
     });
-    if (AVExceptionHolder.exists()) throw AVExceptionHolder.remove();
+    if (AVExceptionHolder.exists())
+      throw AVExceptionHolder.remove();
     return reference.get();
   }
 
   private static <T> void rpcFunctionInBackground(String name, Object params, final boolean sync,
       final FunctionCallback<T> callback) {
     String paramString = AVUtils.restfulCloudData(params);
-    PaasClient.cloudInstance().postObject("call/" + name, paramString,
-        sync, new GenericObjectCallback() {
+    PaasClient.cloudInstance().postObject("call/" + name, paramString, sync,
+        new GenericObjectCallback() {
           @Override
           public void onSuccess(String content, AVException e) {
             callback.internalDone((T) convertCloudResponse(content), e);

@@ -4,10 +4,8 @@ import android.os.Parcel;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONType;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.avos.avoscloud.internal.InternalConfigurationController;
 
-import java.io.File;
 import java.util.*;
 
 @JSONType(ignores = {"query", "password"}, asm = false)
@@ -1702,7 +1700,7 @@ public class AVUser extends AVObject {
       throw new IllegalArgumentException("Blank user objectId.");
     }
     AVFellowshipQuery query = new AVFellowshipQuery<T>("_Follower", clazz);
-    query.whereEqualTo("user", AVUser.createWithoutData("_User", userObjectId));
+    query.whereEqualTo("user", AVObject.createWithoutData("_User", userObjectId));
     query.setFriendshipTag(AVUser.FOLLOWER_TAG);
     return query;
   }
@@ -1742,7 +1740,7 @@ public class AVUser extends AVObject {
       throw new IllegalArgumentException("Blank user objectId.");
     }
     AVFellowshipQuery query = new AVFellowshipQuery<T>("_Followee", clazz);
-    query.whereEqualTo("user", AVUser.createWithoutData("_User", userObjectId));
+    query.whereEqualTo("user", AVObject.createWithoutData("_User", userObjectId));
     query.setFriendshipTag(AVUser.FOLLOWEE_TAG);
     return query;
   }

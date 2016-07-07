@@ -47,6 +47,7 @@ public abstract class CountCallback extends AVCallback<Integer> {
    * @param returnValue
    * @param e
    */
+  @Override
   protected final void internalDone0(Integer returnValue, AVException e) {
     done(returnValue == null ? -1 : returnValue, e);
   }

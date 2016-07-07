@@ -33,6 +33,7 @@ public abstract class FindCallback<T extends AVObject> extends AVCallback<java.u
    */
   public abstract void done(List<T> parseObjects, AVException parseException);
 
+  @Override
   protected final void internalDone0(List<T> returnValue, AVException e) {
     done(returnValue, e);
   }

@@ -3,8 +3,6 @@ package com.avos.avoscloud;
 import com.avos.avoscloud.internal.InternalConfigurationController;
 import com.avos.avoscloud.okhttp.internal.framed.Header;
 
-import java.net.SocketTimeoutException;
-
 public class GetHttpResponseHandler extends AsyncHttpResponseHandler {
 
 

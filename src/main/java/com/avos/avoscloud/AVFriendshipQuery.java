@@ -30,8 +30,7 @@ public class AVFriendshipQuery<T extends AVUser> {
     final AVFriendshipCallback internalCallback = callback;
     conditions.assembleParameters();
     PaasClient.storageInstance().getObject(path, new AVRequestParams(conditions.getParameters()),
-        sync, null,
-        new GenericObjectCallback() {
+        sync, null, new GenericObjectCallback() {
           @Override
           public void onSuccess(String content, AVException e) {
             AVFriendship<T> friendship = null;
@@ -312,10 +311,9 @@ public class AVFriendshipQuery<T extends AVUser> {
 
   /**
    * Add a constraint to the query that requires a particular key's value match another
-   * AVFriendshipQuery.
-   * This only works on keys whose values are AVObjects or lists of AVObjects. Add a constraint to
-   * the query that requires a particular key's value to contain every one of the provided list of
-   * values.
+   * AVFriendshipQuery. This only works on keys whose values are AVObjects or lists of AVObjects.
+   * Add a constraint to the query that requires a particular key's value to contain every one of
+   * the provided list of values.
    *
    * @param key The key to check. This key's value must be an array.
    * @param values The values that will match.
@@ -466,7 +464,7 @@ public class AVFriendshipQuery<T extends AVUser> {
    * @param key The key that the string to match is stored in.
    * @param regex The regular expression pattern to match.
    * @param modifiers Any of the following supported PCRE modifiers: i - Case insensitive search m -
-   *          Search across multiple lines of input
+   *        Search across multiple lines of input
    * @return
    */
   public AVFriendshipQuery<T> whereMatches(String key, String regex, String modifiers) {

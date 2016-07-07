@@ -13,16 +13,15 @@ public abstract class AVMobilePhoneVerifyCallback extends AVCallback<Void> {
    * </p>
    * 
    * <pre>
-   * AVUser.verifyMobilePhoneInBackgroud(&quot;123456&quot;,
-   *     new AVMobilePhoneVerifyCallback() {
-   *       public void done(AVException e) {
-   *         if (e == null) {
-   *           requestedSuccessfully();
-   *         } else {
-   *           requestDidNotSucceed();
-   *         }
-   *       }
-   *     });
+   * AVUser.verifyMobilePhoneInBackgroud(&quot;123456&quot;, new AVMobilePhoneVerifyCallback() {
+   *   public void done(AVException e) {
+   *     if (e == null) {
+   *       requestedSuccessfully();
+   *     } else {
+   *       requestDidNotSucceed();
+   *     }
+   *   }
+   * });
    * </pre>
    */
   @Override

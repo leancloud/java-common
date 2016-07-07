@@ -1,7 +1,6 @@
 package com.avos.avoscloud;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -36,7 +35,7 @@ public class AVOperationQueue {
   }
 
   public AVOperation popHead() {
-    return (AVOperation) queue.poll();
+    return queue.poll();
   }
 
   public boolean noPendingRequest() {

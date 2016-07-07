@@ -16,6 +16,7 @@ public abstract class FollowCallback<T extends AVObject> extends AVCallback<T> {
    */
   public abstract void done(T object, AVException e);
 
+  @Override
   protected final void internalDone0(T returnValue, AVException e) {
     done(returnValue, e);
   }

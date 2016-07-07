@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.alibaba.fastjson.annotation.JSONType;
-import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.AVUtils;
 
 @JSONType(ignores = {"amount"})
 public class IncrementOp extends BaseOp implements SingleValueOp {
@@ -72,10 +70,12 @@ public class IncrementOp extends BaseOp implements SingleValueOp {
     }
   }
 
+  @Override
   public Number getValues() {
     return amount;
   }
 
+  @Override
   public Number apply(Object value) {
     Number result = 0L;
     if (value == null) {

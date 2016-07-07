@@ -1,6 +1,5 @@
 package com.avos.avoscloud.ops;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -44,10 +43,12 @@ public class CompoundOp extends CollectionOp {
     return ops.removeLast();
   }
 
+  @Override
   public List<AVOp> getValues() {
     return ops;
   }
 
+  @Override
   public Object apply(Object oldValue) {
     for (AVOp op : ops) {
       oldValue = op.apply(oldValue);

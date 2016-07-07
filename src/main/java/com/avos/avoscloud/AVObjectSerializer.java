@@ -33,8 +33,7 @@ class AVObjectSerializer implements ObjectSerializer {
       AVStatus status = (AVStatus) avObject;
       out.writeFieldName("dataMap");
       out.write(JSON.toJSONString(status.getData(), ObjectValueFilter.instance,
-          SerializerFeature.WriteClassName,
-          SerializerFeature.DisableCircularReferenceDetect));
+          SerializerFeature.WriteClassName, SerializerFeature.DisableCircularReferenceDetect));
 
       out.write(',');
       out.writeFieldName("inboxType");
@@ -46,20 +45,17 @@ class AVObjectSerializer implements ObjectSerializer {
         out.write(',');
         out.writeFieldName("source");
         out.write(JSON.toJSONString(status.getSource(), ObjectValueFilter.instance,
-            SerializerFeature.WriteClassName,
-            SerializerFeature.DisableCircularReferenceDetect));
+            SerializerFeature.WriteClassName, SerializerFeature.DisableCircularReferenceDetect));
       }
     } else {
       out.writeFieldName("serverData");
       out.write(JSON.toJSONString(avObject.serverData, ObjectValueFilter.instance,
-          SerializerFeature.WriteClassName,
-          SerializerFeature.DisableCircularReferenceDetect));
+          SerializerFeature.WriteClassName, SerializerFeature.DisableCircularReferenceDetect));
       if (!avObject.operationQueue.isEmpty()) {
         out.write(',');
         out.writeFieldName("operationQueue");
         out.write(JSON.toJSONString(avObject.operationQueue, ObjectValueFilter.instance,
-            SerializerFeature.WriteClassName,
-            SerializerFeature.DisableCircularReferenceDetect));
+            SerializerFeature.WriteClassName, SerializerFeature.DisableCircularReferenceDetect));
       }
     }
     out.write('}');

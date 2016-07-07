@@ -99,6 +99,7 @@ public abstract class HttpClientUploader implements Uploader {
 
 
   // ignore interrupt so far.
+  @Override
   public boolean cancel(boolean interrupt) {
     if (cancelled) {
       return false;
@@ -121,6 +122,7 @@ public abstract class HttpClientUploader implements Uploader {
     }
   }
 
+  @Override
   public boolean isCancelled() {
     return cancelled;
   }

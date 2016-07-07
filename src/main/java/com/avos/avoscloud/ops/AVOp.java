@@ -2,8 +2,6 @@ package com.avos.avoscloud.ops;
 
 import java.util.Map;
 
-import com.avos.avoscloud.AVObject;
-
 /**
  * A avoscloud operation
  * 
