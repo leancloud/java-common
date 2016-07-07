@@ -1,40 +1,34 @@
 package com.avos.avoscloud;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.alibaba.fastjson.JSON;
-
-import java.io.FileNotFoundException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
 import com.avos.avoscloud.internal.InternalConfigurationController;
 import com.avos.avoscloud.okhttp.Call;
 import com.avos.avoscloud.okhttp.MediaType;
 import com.avos.avoscloud.okhttp.Request;
 import com.avos.avoscloud.okhttp.RequestBody;
 import com.avos.avoscloud.okhttp.Response;
+import com.avos.avoscloud.FileUploader.ProgressCalculator;
+import com.avos.avoscloud.FileUploader.FileUploadProgressCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * User: summer,dennis Date: 13-4-15 Time: PM4:12
  */
 class QiniuUploader extends HttpClientUploader {
-  private String bucket;
   private String token;
-  private String key;
-  private String hash;
-  private String objectId;
-  private String url;
   private String[] uploadFileCtx;
   private int blockCount;
+  private String fileKey;
 
   private static final String QINIU_HOST = "http://upload.qiniu.com";
   private static final String QINIU_CREATE_BLOCK_EP = QINIU_HOST + "/mkblk/%d";
@@ -45,40 +39,32 @@ class QiniuUploader extends HttpClientUploader {
   private static final int NONWIFI_CHUNK_SIZE = 64 * 1024;
 
   private static final int DEFAULT_RETRY_TIMES = 6;
-  static final int PROGRESS_GET_TOKEN = 10;
-  static final int PROGRESS_UPLOAD_FILE = 90;
-  private static final int PROGRESS_COMPLETE = 100;
 
+  private ProgressCalculator progressCalculator;
   private volatile Call mergeFileRequestCall;
   private volatile Future[] tasks;
+  private AVFile parseFile;
 
-  QiniuUploader(AVFile parseFile, SaveCallback saveCallback, ProgressCallback progressCallback) {
-    super(parseFile, saveCallback, progressCallback);
+  QiniuUploader(AVFile parseFile, String token, String fileKey, SaveCallback saveCallback,
+      ProgressCallback progressCallback) {
+    super(saveCallback, progressCallback);
+    this.parseFile = parseFile;
+    this.token = token;
+    this.fileKey = fileKey;
   }
 
   int uploadChunkSize = WIFI_CHUNK_SIZE;
   static final ExecutorService fileUploadExecutor = Executors.newFixedThreadPool(10);
 
   @Override
-  AVException doWork() {
-    parseFileKey();
+  public AVException doWork() {
+
     if (InternalConfigurationController.globalInstance().getInternalLogger().isDebugEnabled()) {
       LogUtil.avlog.d("uploading with chunk size:" + uploadChunkSize);
     }
+    // here to try
     return uploadWithBlocks();
-  }
 
-  private void parseFileKey() {
-    key = AVUtils.getRandomString(defaultFileKeyLength);
-    int idx = 0;
-    if (parseFile.getName() != null) {
-      idx = parseFile.getName().lastIndexOf(".");
-    }
-    // try to add post fix.
-    if (idx > 0) {
-      String postFix = parseFile.getName().substring(idx);
-      key += postFix;
-    }
   }
 
   private Request.Builder addAuthHeader(Request.Builder builder) throws Exception {
@@ -92,27 +78,24 @@ class QiniuUploader extends HttpClientUploader {
 
     try {
       byte[] bytes = parseFile.getData();
-      if (bytes == null) {
-        return new AVException("File doesn't exist", new FileNotFoundException());
-      }
-      // 1.通过服务器申请文件存储地址
-      AVException getBucketException = fetchUploadBucket();
-      if (getBucketException != null) {
-        return getBucketException;
-      }
-      publishProgress(PROGRESS_GET_TOKEN);
       blockCount = (bytes.length / BLOCK_SIZE) + (bytes.length % BLOCK_SIZE > 0 ? 1 : 0);
       uploadFileCtx = new String[blockCount];
 
       // 2.按照分片进行上传
       QiniuBlockResponseData respBlockData = null;
       CountDownLatch latch = new CountDownLatch(blockCount);
+      progressCalculator = new ProgressCalculator(blockCount, new FileUploadProgressCallback() {
+        @Override
+        public void onProgress(int progress) {
+          publishProgress(progress);
+        }
+      });
       tasks = new Future[blockCount];
       synchronized (tasks) {
         for (int blockOffset = 0; blockOffset < blockCount; blockOffset++) {
           tasks[blockOffset] =
               fileUploadExecutor.submit(new FileBlockUploadTask(bytes, blockOffset, latch,
-                  uploadChunkSize, uploadFileCtx, this));
+                  uploadChunkSize, progressCalculator, uploadFileCtx, this));
         }
       }
       latch.await();
@@ -126,21 +109,16 @@ class QiniuUploader extends HttpClientUploader {
         throw AVExceptionHolder.remove();
       }
       // 3 merge文件
-      QiniuMKFileResponseData mkfileResp = makeFile(bytes.length, key, DEFAULT_RETRY_TIMES);
+      QiniuMKFileResponseData mkfileResp = makeFile(bytes.length, fileKey, DEFAULT_RETRY_TIMES);
 
       if (!isCancelled()) {
         // qiniu's status code is 200, but should be 201 like parse..
-        if (mkfileResp == null || !mkfileResp.key.equals(key)) {
-          destroyFileObject();
+        if (mkfileResp == null || !mkfileResp.key.equals(fileKey)) {
           return AVErrorUtils.createException(AVException.OTHER_CAUSE, "upload file failure");
-        } else {
-          parseFile.handleUploadedResponse(objectId, objectId, url);
-          publishProgress(PROGRESS_COMPLETE);
         }
       }
     } catch (Exception e) {
       e.printStackTrace();
-      destroyFileObject();
       return new AVException(e);
     }
     return null;
@@ -210,98 +188,23 @@ class QiniuUploader extends HttpClientUploader {
     throw new Exception(phrase);
   }
 
-  private void destroyFileObject() {
-    if (!AVUtils.isBlankString(this.objectId)) {
-      try {
-        AVObject fileObject = AVObject.createWithoutData("_File", objectId);
-        fileObject.delete();
-      } catch (Exception e) {
-        // ignore
-      }
-    }
-  }
-
-
-
-  // ================================================================================
-  // Private Methods
-  // ================================================================================
-
-  private AVException handleGetBucketResponse(String responseStr, AVException exception) {
-    if (exception != null)
-      return exception;
-    try {
-      JSONObject jsonObject = new JSONObject(responseStr);
-      bucket = jsonObject.getString("bucket");
-      objectId = jsonObject.getString("objectId");
-      token = jsonObject.getString("token");
-      if (AVUtils.isBlankString(token)) {
-        return new AVException(AVException.OTHER_CAUSE, "No token return for qiniu upload");
-      }
-      url = jsonObject.getString("url");
-    } catch (JSONException e) {
-      return new AVException(e);
-    }
-
-    return null;
-  }
-
-  private String getGetBucketParameters() {
-    Map<String, Object> parameters = new HashMap<String, Object>(3);
-    parameters.put("key", key);
-    parameters.put("name", parseFile.getName());
-    parameters.put("mime_type", parseFile.mimeType());
-    parameters.put("metaData", parseFile.getMetaData());
-    parameters.put("__type", AVFile.className());
-    if (parseFile.getACL() != null) {
-      parameters.putAll(AVUtils.getParsedMap(parseFile.getACL().getACLMap()));
-    }
-
-    return AVUtils.restfulServerData(parameters);
-  }
-
-  // http://192.168.1.25:2271/1/qiniu
-  protected String getUploadPath() {
-    return "qiniu";
-  }
-
-  protected AVException fetchUploadBucket() {
-    final AVException[] exceptionWhenGetBucket = new AVException[1];
-    if (!isCancelled()) {
-      PaasClient.storageInstance().postObject(getUploadPath(), getGetBucketParameters(), true,
-          new GenericObjectCallback() {
-            @Override
-            public void onSuccess(String content, AVException e) {
-              exceptionWhenGetBucket[0] = handleGetBucketResponse(content, e);
-            }
-
-            @Override
-            public void onFailure(Throwable error, String content) {
-              exceptionWhenGetBucket[0] = AVErrorUtils.createException(error, content);
-            }
-          });
-      if (exceptionWhenGetBucket[0] != null) {
-        destroyFileObject();
-        return exceptionWhenGetBucket[0];
-      }
-    }
-    return null;
-  }
-
   private static class FileBlockUploadTask implements Runnable {
     private byte[] bytes;
     private int blockOffset;
     CountDownLatch latch;
     final int uploadChunkSize;
+    ProgressCalculator progressCalculator;
     String[] uploadFileCtx;
     QiniuUploader parent;
 
     public FileBlockUploadTask(byte[] bytes, int blockOffset, CountDownLatch latch,
-        int uploadChunkSize, String[] uploadFileCtx, QiniuUploader parent) {
+        int uploadChunkSize, ProgressCalculator progressCalculator, String[] uploadFileCtx,
+        QiniuUploader parent) {
       this.bytes = bytes;
       this.blockOffset = blockOffset;
       this.latch = latch;
       this.uploadChunkSize = uploadChunkSize;
+      this.progressCalculator = progressCalculator;
       this.uploadFileCtx = uploadFileCtx;
       this.parent = parent;
     }
@@ -318,6 +221,7 @@ class QiniuUploader extends HttpClientUploader {
       }
       if (respBlockData != null) {
         uploadFileCtx[blockOffset] = respBlockData.ctx;
+        progressCalculator.publishProgress(blockOffset, 100);
       } else {
         AVExceptionHolder.add(new AVException(AVException.OTHER_CAUSE, "Upload File failure"));
         long count = latch.getCount();
@@ -342,7 +246,7 @@ class QiniuUploader extends HttpClientUploader {
 
         RequestBody requestBody =
             RequestBody.create(MediaType.parse(parent.parseFile.mimeType()), data, blockOffset
-                * blockSize, nextChunkSize);
+                * BLOCK_SIZE, nextChunkSize);
 
         builder = builder.post(requestBody);
         builder = parent.addAuthHeader(builder);
@@ -363,6 +267,8 @@ class QiniuUploader extends HttpClientUploader {
     private QiniuBlockResponseData putFileBlocksToQiniu(final int blockOffset, final byte[] data,
         QiniuBlockResponseData lastChunk, int retry) {
       int currentBlockLength = getCurrentBlockSize(data, blockOffset);
+      progressCalculator.publishProgress(blockOffset, 100 * lastChunk.offset / BLOCK_SIZE);
+
       int remainingBlockLength = currentBlockLength - lastChunk.offset;
 
       if (remainingBlockLength > 0 && lastChunk.offset > 0) {

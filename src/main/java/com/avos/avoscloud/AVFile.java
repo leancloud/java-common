@@ -1,11 +1,10 @@
 package com.avos.avoscloud;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.avos.avoscloud.internal.AppConfiguration.StorageType;
 import com.avos.avoscloud.internal.InternalConfigurationController;
 import com.avos.avoscloud.internal.InternalFileDownloader;
 import com.avos.avoscloud.utils.MimeTypeMap;
-import com.avos.avoscloud.utils.UrlValidator;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,6 +22,7 @@ import java.util.Map;
  * it as a field on a AVObject.
  * </p>
  * Example:
+ * <p/>
  * 
  * <pre>
  * AVFile file = new AVFile(&quot;hello&quot;.getBytes());
@@ -56,7 +56,7 @@ public final class AVFile {
    */
   private String localTmpFilePath;
 
-  transient private AVUploader uploader;
+  transient private Uploader uploader;
   transient private InternalFileDownloader downloader;
   // metadata for file,added by dennis<xzhuang@avos.com>,2013-09-06
   private final HashMap<String, Object> metaData = new HashMap<String, Object>();
@@ -86,7 +86,7 @@ public final class AVFile {
 
   /**
    * Creates a new file from a byte array.
-   * 
+   *
    * @param data The file's data. 请注明文件名
    */
   @Deprecated
@@ -97,7 +97,7 @@ public final class AVFile {
 
   /**
    * 创建一个基于网络文件的AVFile对象
-   * 
+   *
    * @param name 文件名
    * @param url 网络文件的url
    * @param metaData 网络文件的元信息，可以为空
@@ -117,7 +117,7 @@ public final class AVFile {
    * Creates a new file from a byte array and a name. Giving a name with a proper file extension
    * (e.g. ".png") is ideal because it allows AVOSCloud to deduce the content type of the file and
    * set appropriate HTTP headers when it is fetched.
-   * 
+   *
    * @param name The file's name, ideally with extension.
    * @param data The file's data
    */
@@ -131,17 +131,19 @@ public final class AVFile {
       String cachePath =
           InternalConfigurationController.globalInstance().getInternalPersistence()
               .getAVFileCachePath();
+
+
       if (!AVUtils.isBlankString(cachePath)) {
         localTmpFilePath =
             InternalConfigurationController.globalInstance().getInternalPersistence()
                 .getAVFileCachePath()
                 + md5;
-
         InternalConfigurationController.globalInstance().getInternalPersistence()
             .saveContentToFile(data, new File(localTmpFilePath));
       } else {
         this.data = data;
       }
+
       this.metaData.put(FILE_SUM_KEY, md5);
       this.metaData.put("size", data.length);
     } else {
@@ -166,7 +168,7 @@ public final class AVFile {
 
   /**
    * Returns the file object Id.
-   * 
+   *
    * @return The file object id.
    */
   public String getObjectId() {
@@ -175,7 +177,7 @@ public final class AVFile {
 
   /**
    * Set the file objectId.
-   * 
+   *
    * @param objectId file object id.
    */
   public void setObjectId(String objectId) {
@@ -185,11 +187,11 @@ public final class AVFile {
   /**
    * Retrieve a AVFile object by object id from AVOSCloud in background.If the file is not found,it
    * will call the callback with java.io.FileNotFoundException.
-   * 
-   * @deprecated Please use #{@link #withObjectIdInBackground(String, GetFileCallback)}
+   *
    * @param objectId The file object id.
    * @param cb The GetFileCallback instance.
    * @since 1.3.4
+   * @deprecated Please use #{@link #withObjectIdInBackground(String, GetFileCallback)}
    */
   @Deprecated
   static public void parseFileWithObjectIdInBackground(final String objectId,
@@ -200,7 +202,7 @@ public final class AVFile {
   /**
    * Retrieve a AVFile object by object id from AVOSCloud in background.If the file is not found,it
    * will call the callback with java.io.FileNotFoundException.
-   * 
+   *
    * @param objectId The file object id.
    * @param cb The GetFileCallback instance.
    * @since 2.0.2
@@ -232,12 +234,12 @@ public final class AVFile {
   /**
    * Retrieve a AVFile object by object id from AVOSCloud.If the file is not found,it will throw
    * java.io.FileNotFoundException.
-   * 
-   * @since 1.3.4
-   * @deprecated Please use #{@link #withObjectId(String)}
+   *
    * @param objectId
    * @return
    * @throws AVException ,FileNotFoundException
+   * @since 1.3.4
+   * @deprecated Please use #{@link #withObjectId(String)}
    */
   @Deprecated
   static public AVFile parseFileWithObjectId(String objectId) throws AVException,
@@ -248,11 +250,11 @@ public final class AVFile {
   /**
    * Retrieve a AVFile object by object id from AVOSCloud.If the file is not found,it will throw
    * java.io.FileNotFoundException.
-   * 
-   * @since 2.0.2
+   *
    * @param objectId
    * @return
    * @throws AVException ,FileNotFoundException
+   * @since 2.0.2
    */
   public static AVFile withObjectId(String objectId) throws AVException, FileNotFoundException {
     AVQuery<AVObject> query = new AVQuery<AVObject>("_File");
@@ -267,11 +269,11 @@ public final class AVFile {
 
   /**
    * Construct a AVFile from AVObject.
-   * 
-   * @deprecated Please use #{@link #withAVObject(AVObject)}
+   *
    * @param obj The parse object.
    * @return The parse file object.
    * @since 1.3.4
+   * @deprecated Please use #{@link #withAVObject(AVObject)}
    */
   @Deprecated
   static public AVFile parseFileWithAVObject(AVObject obj) {
@@ -280,7 +282,7 @@ public final class AVFile {
 
   /**
    * Construct a AVFile from AVObject.
-   * 
+   *
    * @param obj The parse object.
    * @return The parse file object.
    * @since 2.0.2
@@ -316,10 +318,10 @@ public final class AVFile {
    * Creates a new file from local file path. Giving a name with a proper file extension (e.g.
    * ".png") is ideal because it allows AVOSCloud to deduce the content type of the file and set
    * appropriate HTTP headers when it is fetched.
-   * 
-   * @deprecated Please use #{@link #withAbsoluteLocalPath(String, String)}
+   *
    * @param name The file's name, ideally with extension.
    * @param absoluteLocalFilePath The file's absolute path.
+   * @deprecated Please use #{@link #withAbsoluteLocalPath(String, String)}
    */
   @Deprecated
   static public AVFile parseFileWithAbsoluteLocalPath(String name, String absoluteLocalFilePath)
@@ -331,10 +333,10 @@ public final class AVFile {
    * Creates a new file from local file path. Giving a name with a proper file extension (e.g.
    * ".png") is ideal because it allows AVOSCloud to deduce the content type of the file and set
    * appropriate HTTP headers when it is fetched.
-   * 
-   * @since 2.0.2
+   *
    * @param name The file's name, ideally with extension.
    * @param absoluteLocalFilePath The file's absolute path.
+   * @since 2.0.2
    */
   public static AVFile withAbsoluteLocalPath(String name, String absoluteLocalFilePath)
       throws FileNotFoundException {
@@ -343,14 +345,14 @@ public final class AVFile {
 
   /**
    * Creates a new file from java.io.File object.
-   * 
-   * @deprecated Please use #{@link #withFile(String, File)}
-   * @since 1.3.4
+   *
    * @param name The file's name, ideally with extension.
    * @param file The file object.
    * @return
    * @throws FileNotFoundException
    * @throws IOException
+   * @since 1.3.4
+   * @deprecated Please use #{@link #withFile(String, File)}
    */
   @Deprecated
   public static AVFile parseFileWithFile(String name, File file) throws FileNotFoundException {
@@ -359,13 +361,13 @@ public final class AVFile {
 
   /**
    * Creates a new file from java.io.File object.
-   * 
-   * @since 2.0.2
+   *
    * @param name The file's name, ideally with extension.
    * @param file The file object.
    * @return
    * @throws FileNotFoundException
    * @throws IOException
+   * @since 2.0.2
    */
   public static AVFile withFile(String name, File file) throws FileNotFoundException {
     if (file == null)
@@ -396,7 +398,7 @@ public final class AVFile {
 
   /**
    * Returns the file's metadata map.
-   * 
+   *
    * @return The file's metadata map.
    * @since 1.3.4
    */
@@ -406,7 +408,7 @@ public final class AVFile {
 
   /**
    * Added meta data to file.
-   * 
+   *
    * @param key The meta data's key.
    * @param val The meta data's value.
    * @return The old metadata value.
@@ -418,7 +420,7 @@ public final class AVFile {
 
   /**
    * Returns the metadata value by key.
-   * 
+   *
    * @param key The metadata key
    * @return The value.
    * @since 1.3.4
@@ -429,7 +431,7 @@ public final class AVFile {
 
   /**
    * Returns the file size in bytes.
-   * 
+   *
    * @return File size in bytes
    * @since 1.3.4
    */
@@ -443,7 +445,7 @@ public final class AVFile {
 
   /**
    * Returns the file's owner
-   * 
+   *
    * @return File's owner
    * @since 1.3.4
    */
@@ -453,7 +455,7 @@ public final class AVFile {
 
   /**
    * Remove file meta data.
-   * 
+   *
    * @param key The meta data's key
    * @return The metadata value.
    * @since 1.3.4
@@ -472,7 +474,7 @@ public final class AVFile {
   /**
    * The filename. Before save is called, this is just the filename given by the user (if any).
    * After save is called, that name gets prefixed with a unique identifier.
-   * 
+   *
    * @return The file's name.
    */
   public String getName() {
@@ -480,7 +482,6 @@ public final class AVFile {
   }
 
   /**
-   * 
    * @return
    */
   public String getOriginalName() {
@@ -488,7 +489,6 @@ public final class AVFile {
   }
 
   /**
-   * 
    * @param name
    */
   void setName(String name) {
@@ -510,7 +510,7 @@ public final class AVFile {
 
   /**
    * Whether the file still needs to be saved.
-   * 
+   *
    * @return Whether the file needs to be saved.
    */
   public boolean isDirty() {
@@ -529,7 +529,7 @@ public final class AVFile {
   /**
    * This returns the url of the file. It's only available after you save or after you get the file
    * from a AVObject.
-   * 
+   *
    * @return The url of the file.
    */
   public String getUrl() {
@@ -540,12 +540,12 @@ public final class AVFile {
 
   /**
    * Returns a thumbnail image url using QiNiu endpoints.
-   * 
+   *
    * @param scaleToFit
    * @param width
    * @param height
-   * @see #getThumbnailUrl(boolean, int, int, int, String)
    * @return
+   * @see #getThumbnailUrl(boolean, int, int, int, String)
    */
   public String getThumbnailUrl(boolean scaleToFit, int width, int height) {
     return this.getThumbnailUrl(scaleToFit, width, height, 100, "png");
@@ -553,7 +553,7 @@ public final class AVFile {
 
   /**
    * 返回缩略图URl 这个服务仅仅适用于保存在Qiniu的图片
-   * 
+   *
    * @param scaleToFit Whether to scale the image
    * @param width The thumbnail image's width
    * @param height The thumbnail image'height
@@ -590,25 +590,30 @@ public final class AVFile {
 
   /**
    * Saves the file to the AVOSCloud cloud synchronously.
-   * 
+   *
    * @throws AVException
    */
   public void save() throws AVException {
+    // 如果文件已经上传过，则不再进行上传
     if (AVUtils.isBlankString(objectId)) {
       cancelUploadIfNeed();
-
+      final AVException[] avExceptions = new AVException[1];
       uploader = this.getUploader(null, null);
 
+      if (null != avExceptions[0]) {
+        throw avExceptions[0];
+      }
       AVException exception = uploader.doWork();
-      if (exception != null)
+      if (exception != null) {
         throw exception;
+      }
     }
   }
 
   /**
    * Saves the file to the AVOSCloud cloud in a background thread. progressCallback is guaranteed to
    * be called with 100 before saveCallback is called.
-   * 
+   *
    * @param saveCallback A SaveCallback that gets called when the save completes.
    * @param progressCallback A ProgressCallback that is called periodically with progress updates.
    */
@@ -616,25 +621,20 @@ public final class AVFile {
       final ProgressCallback progressCallback) {
     if (AVUtils.isBlankString(objectId)) {
       cancelUploadIfNeed();
-      try {
-        uploader = this.getUploader(saveCallback, progressCallback);
-      } catch (AVException e) {
-        saveCallback.internalDone(e);
-      }
-      uploader.execute();
+      getUploader(saveCallback, progressCallback).execute();
     } else {
       if (null != saveCallback) {
         saveCallback.internalDone(null);
       }
       if (null != progressCallback) {
-        progressCallback.internalDone(100,null);
+        progressCallback.internalDone(100, null);
       }
     }
   }
 
   /**
    * Saves the file to the AVOSCloud cloud in a background thread.
-   * 
+   *
    * @param callback A SaveCallback that gets called when the save completes.
    */
   public void saveInBackground(SaveCallback callback) {
@@ -652,7 +652,7 @@ public final class AVFile {
    * Synchronously gets the data for this object. You probably want to use
    * AVFile.getDataInBackground(com.parse.GetDataCallback, com.parse.ProgressCallback) instead
    * unless you're already in a background thread.
-   * 
+   *
    * @throws AVException
    */
   @Deprecated
@@ -672,22 +672,19 @@ public final class AVFile {
       cancelDownloadIfNeed();
       downloader =
           InternalConfigurationController.globalInstance().getDownloaderInstance(null, null);
-      if (downloader == null) {
-        throw new AVException(AVException.UNSUPPORTED_SERVICE, "");
-      }
       AVException exception = downloader.doWork(getUrl());
       if (exception != null) {
         throw exception;
       }
       return getCacheData();
     }
-    return null;
+    return this.data;
   }
 
   /**
    * Gets the data for this object in a background thread. progressCallback is guaranteed to be
    * called with 100 before dataCallback is called.
-   * 
+   *
    * @param dataCallback A GetDataCallback that is called when the get completes.
    * @param progressCallback A ProgressCallback that is called periodically with progress updates.
    */
@@ -721,6 +718,7 @@ public final class AVFile {
         }
         return;
       }
+
       downloader.execute(getUrl());
     } else if (dataCallback != null) {
       dataCallback.internalDone(new AVException(AVException.INVALID_FILE_URL, ""));
@@ -729,7 +727,7 @@ public final class AVFile {
 
   /**
    * Gets the data for this object in a background thread.
-   * 
+   *
    * @param dataCallback A GetDataCallback that is called when the get completes.
    */
   public void getDataInBackground(GetDataCallback dataCallback) {
@@ -765,7 +763,7 @@ public final class AVFile {
 
   /**
    * need call this if upload success
-   * 
+   *
    * @param uniqueName
    * @param url
    */
@@ -778,8 +776,8 @@ public final class AVFile {
   }
 
   /**
-   * @see AVObject#delete()
    * @throws AVException
+   * @see AVObject#delete()
    * @since 1.3.4
    */
   public void delete() throws AVException {
@@ -800,9 +798,9 @@ public final class AVFile {
   }
 
   /**
+   * @param callback
    * @see AVObject#deleteEventually(DeleteCallback callback);
    * @since 1.3.4
-   * @param callback
    */
   public void deleteEventually(DeleteCallback callback) {
     if (getFileObject() != null)
@@ -819,9 +817,9 @@ public final class AVFile {
   }
 
   /**
+   * @param callback
    * @see AVObject#deleteInBackground(DeleteCallback callback);
    * @since 1.3.4
-   * @param callback
    */
   public void deleteInBackground(DeleteCallback callback) {
     if (getFileObject() != null)
@@ -845,25 +843,12 @@ public final class AVFile {
     return "File";
   }
 
-  protected AVUploader getUploader(final SaveCallback saveCallback,
-      final ProgressCallback progressCallback) throws AVException {
-    if (this.objectId == null && !AVUtils.isBlankString(url)) {
-      if (UrlValidator.getInstance().isValid(url))
-        return new UrlDirectlyUploader(this, saveCallback, progressCallback);
-      else {
-        throw new AVException(AVException.INVALID_FILE_URL, "Invalid File URL");
-      }
+  public Uploader getUploader(SaveCallback saveCallback, ProgressCallback progressCallback) {
+    if (AVUtils.isBlankString(url)) {
+      return new FileUploader(this, saveCallback, progressCallback);
+    } else {
+      return new UrlDirectlyUploader(this, saveCallback, progressCallback);
     }
-    switch (InternalConfigurationController.globalInstance().getAppConfiguration().getStorageType()) {
-      case StorageTypeQiniu:
-        return new QiniuUploader(this, saveCallback, progressCallback);
-      case StorageTypeS3:
-        return new S3Uploader(this, saveCallback, progressCallback);
-      default:
-        LogUtil.log.e();
-        break;
-    }
-    return null;
   }
 
   public String getBucket() {
@@ -876,22 +861,21 @@ public final class AVFile {
 
   /**
    * 此函数对应的是获得“用户传过来的本地文件”的具体内容
-   * 
+   *
    * @return
    */
   @JSONField(serialize = false)
-  protected byte[] getLocalFileData() {
+  private byte[] getLocalFileData() {
     if (!AVUtils.isBlankString(localPath)) {
       return InternalConfigurationController.globalInstance().getInternalPersistence()
           .readContentBytesFromFile(new File(localPath));
-    } else {
-      return data;
     }
+    return null;
   }
 
   /**
    * 此函数对应的是获得“用户传过来的 byte[]”的具体内容
-   * 
+   *
    * @return
    */
   @JSONField(serialize = false)
@@ -899,14 +883,13 @@ public final class AVFile {
     if (!AVUtils.isBlankString(localTmpFilePath)) {
       return InternalConfigurationController.globalInstance().getInternalPersistence()
           .readContentBytesFromFile(new File(localTmpFilePath));
-    } else {
-      return data;
     }
+    return null;
   }
 
   /**
    * 此函数对应的是获得“通过 Url 下载来的”的具体内容
-   * 
+   *
    * @return
    */
   @JSONField(serialize = false)
@@ -925,7 +908,7 @@ public final class AVFile {
 
   /**
    * 获取AVFile的ACL
-   * 
+   *
    * @since 2.6.9
    */
   protected AVACL getACL() {

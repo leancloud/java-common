@@ -1,19 +1,22 @@
 package com.avos.avoscloud;
 
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONObject;
+class UrlDirectlyUploader extends HttpClientUploader {
 
-public class UrlDirectlyUploader extends HttpClientUploader {
+  AVFile parseFile;
 
   protected UrlDirectlyUploader(AVFile parseFile, SaveCallback saveCallback,
-      ProgressCallback progressCallback) {
-    super(parseFile, saveCallback, progressCallback);
+                                ProgressCallback progressCallback) {
+    super(saveCallback, progressCallback);
+    this.parseFile = parseFile;
   }
 
   @Override
-  AVException doWork() {
+  public AVException doWork() {
 
     final AVException[] exceptionSaveFile = new AVException[1];
     PaasClient.storageInstance().postObject(AVPowerfulUtils.getEndpoint(parseFile),
@@ -26,6 +29,7 @@ public class UrlDirectlyUploader extends HttpClientUploader {
                 JSONObject jsonObject = new JSONObject(content);
                 parseFile.handleUploadedResponse(jsonObject.getString("objectId"),
                     jsonObject.getString("objectId"), parseFile.getUrl());
+                publishProgress(100);
               } catch (Exception ex) {
                 exceptionSaveFile[0] = new AVException(ex);
               }
