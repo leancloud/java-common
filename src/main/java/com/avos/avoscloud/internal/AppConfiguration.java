@@ -7,21 +7,15 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import com.avos.avoscloud.AVOSServices;
 import com.avos.avoscloud.AVUtils;
-import com.avos.avoscloud.AppRouterManager;
 
 public abstract class AppConfiguration {
 
-  public String applicationId;
-  public String clientKey;
+  String applicationId;
+  String clientKey;
   protected StorageType storageType = StorageType.StorageTypeQiniu;
 
   protected static Map<String, String> serviceHostMap = Collections
       .synchronizedMap(new HashMap<String, String>());
-
-  static {
-    serviceHostMap.put(AVOSServices.STORAGE_SERVICE.toString(), AppRouterManager.getInstance()
-        .getAPIServer());
-  }
 
   public enum StorageType {
     StorageTypeQiniu, StorageTypeAV, StorageTypeS3;
@@ -50,4 +44,22 @@ public abstract class AppConfiguration {
 
   public abstract boolean isConnected();
 
+  // 我们在这里做一些额外的配置
+  protected abstract void setEnv();
+
+  public String getApplicationId() {
+    return applicationId;
+  }
+
+  public void setApplicationId(String applicationId) {
+    this.applicationId = applicationId;
+  }
+
+  public String getClientKey() {
+    return clientKey;
+  }
+
+  public void setClientKey(String clientKey) {
+    this.clientKey = clientKey;
+  }
 }

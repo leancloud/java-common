@@ -59,8 +59,8 @@ public class AppRouterManager {
    */
   public String getAPIServer() {
     if (AVUtils.isBlankContent(apiServer)) {
-      return isQCloudApp(InternalConfigurationController.globalInstance().getAppConfiguration().applicationId) ? DEFAULT_QCLOUD_API_SERVER
-          : DETAULT_UCLOUD_API_SERVER;
+      return isQCloudApp(InternalConfigurationController.globalInstance().getAppConfiguration()
+          .getApplicationId()) ? DEFAULT_QCLOUD_API_SERVER : DETAULT_UCLOUD_API_SERVER;
     }
     return apiServer;
   }
@@ -72,8 +72,8 @@ public class AppRouterManager {
    */
   public String getRouterServer() {
     if (AVUtils.isBlankContent(routerServer)) {
-      return isQCloudApp(InternalConfigurationController.globalInstance().getAppConfiguration().applicationId) ? DEFAULT_QCLOUD_ROUTER_SERVER
-          : DEFAULT_UCLOUD_ROUTER_SERVER;
+      return isQCloudApp(InternalConfigurationController.globalInstance().getAppConfiguration()
+          .getApplicationId()) ? DEFAULT_QCLOUD_ROUTER_SERVER : DEFAULT_UCLOUD_ROUTER_SERVER;
     }
     return routerServer;
   }
@@ -129,11 +129,10 @@ public class AppRouterManager {
     if (force || System.currentTimeMillis() - lastTime > ttl * 1000) {
       PaasClient.AVHttpClient client = new PaasClient.AVHttpClient();
       Request.Builder builder = new Request.Builder();
-      builder
-          .url(
-              ROUTER_ADDRESS
-                  + InternalConfigurationController.globalInstance().getAppConfiguration().applicationId)
-          .get();
+      builder.url(
+          ROUTER_ADDRESS
+              + InternalConfigurationController.globalInstance().getAppConfiguration()
+                  .getApplicationId()).get();
       client.execute(builder.build(), false, new GetHttpResponseHandler(
           new GenericObjectCallback() {
             @Override
@@ -196,7 +195,8 @@ public class AppRouterManager {
   private void updateServers() {
     routerSharePreferenceName =
         "com.avos.avoscloud.approuter."
-            + InternalConfigurationController.globalInstance().getAppConfiguration().applicationId;
+            + InternalConfigurationController.globalInstance().getAppConfiguration()
+                .getApplicationId();
     routerServer =
         InternalConfigurationController
             .globalInstance()

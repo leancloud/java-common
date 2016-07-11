@@ -15,7 +15,18 @@ import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.TimeZone;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1007,8 +1018,8 @@ public class AVUtils {
 
   public static String getSessionKey(String selfId) {
     StringBuilder sb =
-        new StringBuilder(
-            InternalConfigurationController.globalInstance().getAppConfiguration().applicationId);
+        new StringBuilder(InternalConfigurationController.globalInstance().getAppConfiguration()
+            .getApplicationId());
     sb.append(selfId);
     return sb.toString();
   }

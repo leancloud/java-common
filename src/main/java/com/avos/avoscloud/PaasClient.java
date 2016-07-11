@@ -1,6 +1,23 @@
 package com.avos.avoscloud;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.CookieHandler;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.TimeUnit;
+
 import com.alibaba.fastjson.JSON;
+import com.avos.avoscloud.internal.AppConfiguration;
 import com.avos.avoscloud.internal.InternalCache;
 import com.avos.avoscloud.internal.InternalConfigurationController;
 import com.avos.avoscloud.okhttp.Call;
@@ -17,15 +34,6 @@ import com.avos.avoscloud.okio.BufferedSource;
 import com.avos.avoscloud.okio.ForwardingSource;
 import com.avos.avoscloud.okio.Okio;
 import com.avos.avoscloud.okio.Source;
-import com.avos.avoscloud.internal.AppConfiguration;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.CookieHandler;
-import java.net.URI;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 
 public class PaasClient {
@@ -130,7 +138,7 @@ public class PaasClient {
         (currAVUser != null && currAVUser.getSessionToken() != null) ? currAVUser.getSessionToken()
             : "");
     builder.header(applicationIdField, InternalConfigurationController.globalInstance()
-        .getAppConfiguration().applicationId);
+        .getAppConfiguration().getApplicationId());
     builder.header("Accept", defaultContentType);
     builder.header("Content-Type", defaultContentType);
     builder.header("User-Agent", InternalConfigurationController.globalInstance()
@@ -693,20 +701,20 @@ public class PaasClient {
       string =
           String.format("curl -X GET -H \"%s: %s\" -H \"%s: %s\" -G --data-urlencode \'%s\' %s",
               applicationIdField, InternalConfigurationController.globalInstance()
-                  .getAppConfiguration().applicationId, apiKeyField, getDebugClientKey(),
+                  .getAppConfiguration().getApplicationId(), apiKeyField, getDebugClientKey(),
               parameters, path);
     } else {
       string =
           String.format("curl -X GET -H \"%s: %s\" -H \"%s: %s\"  %s", applicationIdField,
-              InternalConfigurationController.globalInstance().getAppConfiguration().applicationId,
-              apiKeyField, getDebugClientKey(), path);
+              InternalConfigurationController.globalInstance().getAppConfiguration()
+                  .getApplicationId(), apiKeyField, getDebugClientKey(), path);
     }
     LogUtil.avlog.d(string);
   }
 
   private String getDebugClientKey() {
     if (InternalConfigurationController.globalInstance().getInternalLogger().showInternalDebugLog()) {
-      return InternalConfigurationController.globalInstance().getAppConfiguration().clientKey;
+      return InternalConfigurationController.globalInstance().getAppConfiguration().getClientKey();
     } else {
       return "YourAppKey";
     }
@@ -715,8 +723,8 @@ public class PaasClient {
   private String headerString(Map<String, String> header) {
     String string =
         String.format(" -H \"%s: %s\" -H \"%s: %s\" ", applicationIdField,
-            InternalConfigurationController.globalInstance().getAppConfiguration().applicationId,
-            apiKeyField, getDebugClientKey());
+            InternalConfigurationController.globalInstance().getAppConfiguration()
+                .getApplicationId(), apiKeyField, getDebugClientKey());
     StringBuilder sb = new StringBuilder(string);
     if (header != null) {
       for (Map.Entry<String, String> entry : header.entrySet()) {

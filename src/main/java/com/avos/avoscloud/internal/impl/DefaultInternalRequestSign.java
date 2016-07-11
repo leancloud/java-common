@@ -28,8 +28,8 @@ public class DefaultInternalRequestSign implements InternalRequestSign {
         builder
             .append(ts)
             .append(
-                InternalConfigurationController.globalInstance().getAppConfiguration().clientKey)
-            .toString()).toLowerCase());
+                InternalConfigurationController.globalInstance().getAppConfiguration()
+                    .getClientKey()).toString()).toLowerCase());
     return result.append(',').append(ts).toString();
   }
 }
