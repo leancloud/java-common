@@ -16,4 +16,4 @@ mvn versions:set -DnewVersion=$version
 mvn versions:commit
 sed -i '' "s/sdkVersion = .*;/sdkVersion = \"JavaSDK\/$version\";/" src/main/java/com/avos/avoscloud/internal/impl/DefaultClientConfiguration.java
 
-mvn install
+mvn deploy
