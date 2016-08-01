@@ -1,12 +1,15 @@
 package com.avos.avoscloud;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import android.os.Parcel;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONType;
 import com.avos.avoscloud.internal.InternalConfigurationController;
-
-import java.util.*;
 
 @JSONType(ignores = {"query", "password"}, asm = false)
 public class AVUser extends AVObject {
@@ -576,6 +579,117 @@ public class AVUser extends AVObject {
             }
           }
         }, null, null);
+  }
+
+  /**
+   * Logs in a user with a session token. this saves the session to disk, so you can retrieve the
+   * currently logged in user using AVUser.getCurrentUser(). Don't call this method on the UI thread
+   * 
+   * @param sessionToken The sessionToken to log in with
+   * @return
+   * @throws AVException
+   */
+  public static AVUser becomeWithSessionToken(String sessionToken) throws AVException {
+    return becomeWithSessionToken(sessionToken, AVUser.class);
+  }
+
+  /**
+   * Logs in a user with a session token. this saves the session to disk, so you can retrieve the
+   * currently logged in user using AVUser.getCurrentUser(). Don't call this method on the UI thread
+   * 
+   * @param sessionToken The sessionToken to log in with
+   * @param clazz The AVUser itself or subclass.
+   * @return
+   * @throws AVException
+   */
+  public static <T extends AVUser> AVUser becomeWithSessionToken(String sessionToken, Class<T> clazz)
+      throws AVException {
+    final AVUser[] list = {null};
+
+    becomeWithSessionTokenInBackground(sessionToken, true, new LogInCallback<T>() {
+      @Override
+      public void done(T user, AVException e) {
+        if (e != null) {
+          AVExceptionHolder.add(e);
+        } else {
+          list[0] = user;
+        }
+      }
+
+      @Override
+      public boolean mustRunOnUIThread() {
+        return false;
+      }
+    }, clazz);
+
+    if (AVExceptionHolder.exists()) {
+      throw AVExceptionHolder.remove();
+    }
+    return (T) list[0];
+  }
+
+  /**
+   * Logs in a user with a session token. this saves the session to disk, so you can retrieve the
+   * currently logged in user using AVUser.getCurrentUser().
+   * 
+   * @param sessionToken The sessionToken to log in with
+   * @param callback
+   */
+  public static void becomeWithSessionTokenInBackground(String sessionToken,
+      LogInCallback<AVUser> callback) {
+    becomeWithSessionTokenInBackground(sessionToken, callback, AVUser.class);
+  }
+
+  /**
+   * Logs in a user with a session token. this saves the session to disk, so you can retrieve the
+   * currently logged in user using AVUser.getCurrentUser().
+   * 
+   * @param sessionToken The sessionToken to log in with
+   * @param callback
+   * @param clazz
+   */
+  public static <T extends AVUser> void becomeWithSessionTokenInBackground(String sessionToken,
+      LogInCallback<T> callback, Class<T> clazz) {
+    becomeWithSessionTokenInBackground(sessionToken, false, callback, clazz);
+  }
+
+  private static <T extends AVUser> void becomeWithSessionTokenInBackground(String sessionToken,
+      boolean sync, LogInCallback<T> callback, Class<T> clazz) {
+    final LogInCallback<T> internalCallback = callback;
+    final T user = newAVUser(clazz, callback);
+    if (user == null) {
+      return;
+    }
+
+    AVRequestParams params = new AVRequestParams();
+    params.put("session_token", sessionToken);
+
+    PaasClient.storageInstance().getObject("users/me", params, sync, null,
+        new GenericObjectCallback() {
+          @Override
+          public void onSuccess(String content, AVException e) {
+            AVException error = e;
+            T resultUser = user;
+            if (!AVUtils.isBlankContent(content)) {
+              AVUtils.copyPropertiesFromJsonStringToAVObject(content, user);
+              user.processAuthData(null);
+              AVUser.changeCurrentUser(user, true);
+            } else {
+              resultUser = null;
+              error = new AVException(AVException.OBJECT_NOT_FOUND, "User is not found.");
+            }
+            if (internalCallback != null) {
+              internalCallback.internalDone(resultUser, error);
+            }
+          }
+
+          @Override
+          public void onFailure(Throwable error, String content) {
+            if (internalCallback != null) {
+              internalCallback.internalDone(null, AVErrorUtils.createException(error, content));
+            }
+          }
+        });
   }
 
   /**
