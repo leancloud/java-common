@@ -129,9 +129,12 @@ public class PaasClient {
   }
 
   protected void updateHeaders(Request.Builder builder, Map<String, String> header,
-      boolean needRequestStatistic) {
+      boolean needRequestStatistic) throws AVException {
+    if (!InternalConfigurationController.globalInstance().getAppConfiguration().isConfigured()) {
+      throw new AVException(AVException.NOT_INITIALIZED,
+          "You must call AVOSCloud.initialize before using the AVOSCloud library");
+    }
     // if the field isnt exist, the server will assume it's true
-
     builder.header("X-LC-Prod", isProduction ? "1" : "0");
     AVUser currAVUser = AVUser.getCurrentUser();
     builder.header(sessionTokenField,
@@ -383,7 +386,11 @@ public class PaasClient {
     AVHttpClient client = clientInstance();
     Request.Builder builder = new Request.Builder();
     builder.url(url).get();
-    updateHeaders(builder, myHeader, callback != null && callback.isRequestStatisticNeed());
+    try {
+      updateHeaders(builder, myHeader, callback != null && callback.isRequestStatisticNeed());
+    } catch (AVException e) {
+      processException(e, callback);
+    }
     client.execute(builder.build(), sync, handler);
   }
 
