@@ -14,6 +14,12 @@ import com.avos.avoscloud.internal.impl.DefaultInternalRequestSign;
 import com.avos.avoscloud.internal.impl.EmptyLogger;
 import com.avos.avoscloud.internal.impl.EmptyPersistence;
 
+/**
+ * 用于配置所有平台相关代码的具体实现
+ * 
+ * @author lbt05
+ *
+ */
 public class InternalConfigurationController {
   private InternalConfigurationController() {};
 
@@ -37,28 +43,12 @@ public class InternalConfigurationController {
     return AVUtils.or(clientConfiguration, DefaultClientConfiguration.instance());
   }
 
-  public void setClientConfiguration(InternalClientConfiguration config) {
-    this.clientConfiguration = config;
-  }
-
   public AppConfiguration getAppConfiguration() {
     return AVUtils.or(appConfiguration, DefaultAppConfiguration.instance());
   }
 
-  public void setAppConfiguration(AppConfiguration config) {
-    this.appConfiguration = config;
-  }
-
   public InternalCache getCache() {
     return AVUtils.or(cacheImplmentation, DefaultInternalCacheImpementation.instance());
-  }
-
-  public void setCache(InternalCache cache) {
-    this.cacheImplmentation = cache;
-  }
-
-  public void setInternalCallback(InternalCallback callback) {
-    internalCallback = callback;
   }
 
   public InternalCallback getInternalCallback() {
@@ -69,16 +59,8 @@ public class InternalConfigurationController {
     return AVUtils.or(internalLogger, EmptyLogger.instance());
   }
 
-  public void setInternalLogger(InternalLogger logger) {
-    internalLogger = logger;
-  }
-
   public InternalPersistence getInternalPersistence() {
     return AVUtils.or(internalPersistence, EmptyPersistence.instance());
-  }
-
-  public void setInternalPersistence(InternalPersistence persistence) {
-    this.internalPersistence = persistence;
   }
 
   public InternalFileDownloader getDownloaderInstance(ProgressCallback progressCallback,
@@ -114,18 +96,74 @@ public class InternalConfigurationController {
     return downloader;
   }
 
-  public void setDownloaderImplementation(Class<? extends InternalFileDownloader> clazz) {
-    this.downloadImplementation = clazz;
-  }
-
   public InternalRequestSign getInternalRequestSign() {
     return internalRequestSign == null ? DefaultInternalRequestSign.instance()
         : internalRequestSign;
   }
 
-  public void setInternalRequestSign(InternalRequestSign internalRequestSign) {
-    this.internalRequestSign = internalRequestSign;
+  void configure(Builder builder) {
+    this.clientConfiguration = builder.clientConfiguration;
+    this.appConfiguration = builder.appConfiguration;
+    this.cacheImplmentation = builder.cacheImplmentation;
+    this.internalCallback = builder.internalCallback;
+    this.internalLogger = builder.internalLogger;
+    this.internalPersistence = builder.internalPersistence;
+    this.internalRequestSign = builder.internalRequestSign;
+    this.downloadImplementation = builder.downloadImplementation;
   }
 
+  public static class Builder {
+    InternalClientConfiguration clientConfiguration = globalInstance().getClientConfiguration();
+    AppConfiguration appConfiguration = globalInstance().getAppConfiguration();
+    InternalCache cacheImplmentation = globalInstance().getCache();
+    InternalCallback internalCallback = globalInstance().getInternalCallback();
+    InternalLogger internalLogger = globalInstance().getInternalLogger();
+    InternalPersistence internalPersistence = globalInstance().getInternalPersistence();
+    InternalRequestSign internalRequestSign = globalInstance().getInternalRequestSign();
+    Class<? extends InternalFileDownloader> downloadImplementation;
 
+    public Builder setDownloaderImplementation(Class<? extends InternalFileDownloader> clazz) {
+      this.downloadImplementation = clazz;
+      return this;
+    }
+
+    public Builder setInternalRequestSign(InternalRequestSign internalRequestSign) {
+      this.internalRequestSign = internalRequestSign;
+      return this;
+    }
+
+    public Builder setClientConfiguration(InternalClientConfiguration config) {
+      this.clientConfiguration = config;
+      return this;
+    }
+
+    public Builder setInternalPersistence(InternalPersistence persistence) {
+      this.internalPersistence = persistence;
+      return this;
+    }
+
+    public Builder setAppConfiguration(AppConfiguration config) {
+      this.appConfiguration = config;
+      return this;
+    }
+
+    public Builder setCache(InternalCache cache) {
+      this.cacheImplmentation = cache;
+      return this;
+    }
+
+    public Builder setInternalCallback(InternalCallback callback) {
+      internalCallback = callback;
+      return this;
+    }
+
+    public Builder setInternalLogger(InternalLogger logger) {
+      internalLogger = logger;
+      return this;
+    }
+
+    public void build() {
+      globalInstance().configure(this);
+    }
+  }
 }
