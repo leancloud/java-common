@@ -82,7 +82,6 @@ public class PaasClient {
   }
 
   protected static PaasClient sharedInstance(AVOSServices service) {
-
     String host =
         InternalConfigurationController.globalInstance().getAppConfiguration()
             .getService(service.toString());
@@ -266,7 +265,7 @@ public class PaasClient {
     return apiVersion;
   }
 
-  public void setBaseUrl(final String url) {
+  protected void setBaseUrl(final String url) {
     this.baseUrl = url;
   }
 
