@@ -61,8 +61,6 @@ public class PaasClient {
   public static final String defaultContentType = "application/json";
   public static final String DEFAULT_FAIL_STRING = "request failed!!!";
 
-  public static final String sdkVersion = "v3.13-SNAPSHOT";
-
   private AVACL defaultACL;
 
   private volatile AVHttpClient httpClient;
@@ -70,7 +68,7 @@ public class PaasClient {
   private static String REQUEST_STATIS_HEADER = "X-Android-RS";
   private String baseUrl;
 
-  static HashMap<String, PaasClient> serviceClientMap = new HashMap<String, PaasClient>();
+  static Map<String, PaasClient> serviceClientMap = new HashMap<String, PaasClient>();
   static Map<String, AVObjectReferenceCount> internalObjectsForEventuallySave = Collections
       .synchronizedMap(new HashMap<String, AVObjectReferenceCount>());
 
