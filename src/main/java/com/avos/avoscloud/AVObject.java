@@ -1,10 +1,30 @@
 package com.avos.avoscloud;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.parser.ParserConfig;
+import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.avos.avoscloud.ops.AVOp;
 import com.avos.avoscloud.ops.AddOp;
@@ -17,15 +37,6 @@ import com.avos.avoscloud.ops.IncrementOp;
 import com.avos.avoscloud.ops.RemoveOp;
 import com.avos.avoscloud.ops.RemoveRelationOp;
 import com.avos.avoscloud.ops.SetOp;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * <p>
@@ -51,6 +62,11 @@ public class AVObject implements Parcelable {
 
   static {
     JSON.DEFFAULT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    ParserConfig.getGlobalInstance().putDeserializer(AVObject.class, AVObjectDeserializer.instance);
+    ParserConfig.getGlobalInstance().putDeserializer(AVUser.class, AVObjectDeserializer.instance);
+
+    SerializeConfig.getGlobalInstance().put(AVObject.class, AVObjectSerializer.instance);
+    SerializeConfig.getGlobalInstance().put(AVUser.class, AVObjectSerializer.instance);
   }
 
   private static final String LOGTAG = AVObject.class.getName();
