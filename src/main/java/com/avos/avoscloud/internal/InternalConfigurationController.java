@@ -3,6 +3,7 @@ package com.avos.avoscloud.internal;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVUtils;
 import com.avos.avoscloud.GetDataCallback;
 import com.avos.avoscloud.ProgressCallback;
@@ -21,23 +22,51 @@ import com.avos.avoscloud.internal.impl.EmptyPersistence;
  *
  */
 public class InternalConfigurationController {
-  private InternalConfigurationController() {};
+  private InternalConfigurationController() {
+    this.clientConfiguration = DefaultClientConfiguration.instance();
+    this.appConfiguration = DefaultAppConfiguration.instance();
+    this.cacheImplmentation = DefaultInternalCacheImpementation.instance();
+    this.internalCallback = DefaultInternalCallback.instance();
+    this.internalLogger = EmptyLogger.instance();
+    this.internalPersistence = EmptyPersistence.instance();
+    this.internalRequestSign = DefaultInternalRequestSign.instance();
+    this.downloadImplementation = null;
+  }
 
-  private static InternalConfigurationController instance = new InternalConfigurationController();
+  private InternalConfigurationController(Builder builder) {
+    this.clientConfiguration =
+        AVUtils.or(builder.clientConfiguration, DefaultClientConfiguration.instance());
+    this.appConfiguration =
+        AVUtils.or(builder.appConfiguration, DefaultAppConfiguration.instance());
+    this.cacheImplmentation =
+        AVUtils.or(builder.cacheImplmentation, DefaultInternalCacheImpementation.instance());
+    this.internalCallback =
+        AVUtils.or(builder.internalCallback, DefaultInternalCallback.instance());
+    this.internalLogger = AVUtils.or(builder.internalLogger, EmptyLogger.instance());
+    this.internalPersistence = AVUtils.or(builder.internalPersistence, EmptyPersistence.instance());
+    this.internalRequestSign =
+        AVUtils.or(builder.internalRequestSign, DefaultInternalRequestSign.instance());
+    this.downloadImplementation = builder.downloadImplementation;
+  }
+
+  private static InternalConfigurationController instance;
 
   public static InternalConfigurationController globalInstance() {
+    if (instance == null) {
+      instance = new InternalConfigurationController();
+    }
     return instance;
   }
 
-  private InternalClientConfiguration clientConfiguration;
-  private AppConfiguration appConfiguration;
-  private InternalCache cacheImplmentation;
-  private InternalCallback internalCallback;
-  private InternalLogger internalLogger;
-  private InternalPersistence internalPersistence;
-  private InternalRequestSign internalRequestSign;
+  private final InternalClientConfiguration clientConfiguration;
+  private final AppConfiguration appConfiguration;
+  private final InternalCache cacheImplmentation;
+  private final InternalCallback internalCallback;
+  private final InternalLogger internalLogger;
+  private final InternalPersistence internalPersistence;
+  private final InternalRequestSign internalRequestSign;
 
-  private Class<? extends InternalFileDownloader> downloadImplementation;
+  private final Class<? extends InternalFileDownloader> downloadImplementation;
 
   public InternalClientConfiguration getClientConfiguration() {
     return AVUtils.or(clientConfiguration, DefaultClientConfiguration.instance());
@@ -102,24 +131,17 @@ public class InternalConfigurationController {
   }
 
   void configure(Builder builder) {
-    this.clientConfiguration = builder.clientConfiguration;
-    this.appConfiguration = builder.appConfiguration;
-    this.cacheImplmentation = builder.cacheImplmentation;
-    this.internalCallback = builder.internalCallback;
-    this.internalLogger = builder.internalLogger;
-    this.internalPersistence = builder.internalPersistence;
-    this.internalRequestSign = builder.internalRequestSign;
-    this.downloadImplementation = builder.downloadImplementation;
+
   }
 
   public static class Builder {
-    InternalClientConfiguration clientConfiguration = globalInstance().getClientConfiguration();
-    AppConfiguration appConfiguration = globalInstance().getAppConfiguration();
-    InternalCache cacheImplmentation = globalInstance().getCache();
-    InternalCallback internalCallback = globalInstance().getInternalCallback();
-    InternalLogger internalLogger = globalInstance().getInternalLogger();
-    InternalPersistence internalPersistence = globalInstance().getInternalPersistence();
-    InternalRequestSign internalRequestSign = globalInstance().getInternalRequestSign();
+    InternalClientConfiguration clientConfiguration;
+    AppConfiguration appConfiguration;
+    InternalCache cacheImplmentation;
+    InternalCallback internalCallback;
+    InternalLogger internalLogger;
+    InternalPersistence internalPersistence;
+    InternalRequestSign internalRequestSign;
     Class<? extends InternalFileDownloader> downloadImplementation;
 
     public Builder setDownloaderImplementation(Class<? extends InternalFileDownloader> clazz) {
@@ -162,8 +184,14 @@ public class InternalConfigurationController {
       return this;
     }
 
-    public void build() {
-      globalInstance().configure(this);
+    public void build() throws AVException {
+      InternalConfigurationController configurationController =
+          new InternalConfigurationController(this);
+      if (InternalConfigurationController.instance != null) {
+        throw new AVException(0, "Please call this method before initialize");
+      } else {
+        InternalConfigurationController.instance = configurationController;
+      }
     }
   }
 }
