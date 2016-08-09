@@ -3,9 +3,9 @@ package com.avos.avoscloud.internal;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVUtils;
 import com.avos.avoscloud.GetDataCallback;
+import com.avos.avoscloud.LogUtil;
 import com.avos.avoscloud.ProgressCallback;
 import com.avos.avoscloud.internal.impl.DefaultAppConfiguration;
 import com.avos.avoscloud.internal.impl.DefaultClientConfiguration;
@@ -179,11 +179,12 @@ public class InternalConfigurationController {
       return this;
     }
 
-    public InternalConfigurationController build() throws AVException {
+    public InternalConfigurationController build() {
       InternalConfigurationController configurationController =
           new InternalConfigurationController(this);
       if (InternalConfigurationController.instance != null) {
-        throw new AVException(0, "Please call this method before initialize");
+        LogUtil.log.e("Please call this method before initialize");
+        return null;
       } else {
         InternalConfigurationController.instance = configurationController;
         return configurationController;
