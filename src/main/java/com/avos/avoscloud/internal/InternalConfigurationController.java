@@ -69,27 +69,27 @@ public class InternalConfigurationController {
   private final Class<? extends InternalFileDownloader> downloadImplementation;
 
   public InternalClientConfiguration getClientConfiguration() {
-    return AVUtils.or(clientConfiguration, DefaultClientConfiguration.instance());
+    return clientConfiguration;
   }
 
   public AppConfiguration getAppConfiguration() {
-    return AVUtils.or(appConfiguration, DefaultAppConfiguration.instance());
+    return appConfiguration;
   }
 
   public InternalCache getCache() {
-    return AVUtils.or(cacheImplmentation, DefaultInternalCacheImpementation.instance());
+    return cacheImplmentation;
   }
 
   public InternalCallback getInternalCallback() {
-    return AVUtils.or(internalCallback, DefaultInternalCallback.instance());
+    return internalCallback;
   }
 
   public InternalLogger getInternalLogger() {
-    return AVUtils.or(internalLogger, EmptyLogger.instance());
+    return internalLogger;
   }
 
   public InternalPersistence getInternalPersistence() {
-    return AVUtils.or(internalPersistence, EmptyPersistence.instance());
+    return internalPersistence;
   }
 
   public InternalFileDownloader getDownloaderInstance(ProgressCallback progressCallback,
@@ -126,12 +126,7 @@ public class InternalConfigurationController {
   }
 
   public InternalRequestSign getInternalRequestSign() {
-    return internalRequestSign == null ? DefaultInternalRequestSign.instance()
-        : internalRequestSign;
-  }
-
-  void configure(Builder builder) {
-
+    return internalRequestSign;
   }
 
   public static class Builder {
