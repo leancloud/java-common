@@ -184,13 +184,14 @@ public class InternalConfigurationController {
       return this;
     }
 
-    public void build() throws AVException {
+    public InternalConfigurationController build() throws AVException {
       InternalConfigurationController configurationController =
           new InternalConfigurationController(this);
       if (InternalConfigurationController.instance != null) {
         throw new AVException(0, "Please call this method before initialize");
       } else {
         InternalConfigurationController.instance = configurationController;
+        return configurationController;
       }
     }
   }
