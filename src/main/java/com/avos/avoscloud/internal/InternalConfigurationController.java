@@ -49,7 +49,7 @@ public class InternalConfigurationController {
     this.downloadImplementation = builder.downloadImplementation;
   }
 
-  private static InternalConfigurationController instance;
+  private volatile static InternalConfigurationController instance;
 
   public static InternalConfigurationController globalInstance() {
     if (instance == null) {
@@ -187,6 +187,7 @@ public class InternalConfigurationController {
         return null;
       } else {
         InternalConfigurationController.instance = configurationController;
+        InternalConfigurationController.instance.getAppConfiguration().setEnv();
         return configurationController;
       }
     }
