@@ -14,6 +14,9 @@ public final class AVConstants {
   public static final String AVSEARCH_HIGHTLIGHT = "highlight_avoscloud_";
   public static final String AVSEARCH_APP_URL = "app_url_avoscloud_";
   public static final String AVSEARCH_DEEP_LINK = "deep_link_avoscloud_";
+
+  public static final String AV_MIXPUSH_MI_NOTIFICATION_ACTION =
+      "com.avos.avoscloud.mi_notification_action";
 }
 
 
