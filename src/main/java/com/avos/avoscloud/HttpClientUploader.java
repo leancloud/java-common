@@ -1,15 +1,15 @@
 package com.avos.avoscloud;
 
-import com.avos.avoscloud.internal.InternalConfigurationController;
-import com.avos.avoscloud.okhttp.OkHttpClient;
-import com.avos.avoscloud.okhttp.Request;
-import com.avos.avoscloud.okhttp.Response;
-
 import java.io.IOException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import com.avos.avoscloud.internal.InternalConfigurationController;
+import com.avos.avoscloud.okhttp.OkHttpClient;
+import com.avos.avoscloud.okhttp.Request;
+import com.avos.avoscloud.okhttp.Response;
 
 /**
  * Created with IntelliJ IDEA. User: dennis (xzhuang@avos.com) Date: 13-7-26 Time: 下午3:37
@@ -20,6 +20,8 @@ public abstract class HttpClientUploader implements Uploader {
     this.saveCallback = saveCallback;
     this.progressCallback = progressCallback;
     cancelled = false;
+    InternalConfigurationController.globalInstance().getAppConfiguration()
+        .setupThreadPoolExecutor(executor);
   }
 
   SaveCallback saveCallback;
@@ -39,8 +41,6 @@ public abstract class HttpClientUploader implements Uploader {
     executor =
         new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
             new LinkedBlockingQueue<Runnable>());
-    InternalConfigurationController.globalInstance().getAppConfiguration()
-        .setupThreadPoolExecutor(executor);
   }
 
   protected static synchronized OkHttpClient getOKHttpClient() {
