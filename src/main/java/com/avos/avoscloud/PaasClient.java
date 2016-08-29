@@ -192,7 +192,7 @@ public class PaasClient {
     }
   }
 
-  public static void useAVCloudUS() {
+  protected static void useAVCloudUS() {
     isCN = false;
     InternalConfigurationController.globalInstance().getAppConfiguration()
         .configureService(AVOSServices.STORAGE_SERVICE.toString(), "https://us-api.leancloud.cn");
@@ -210,7 +210,7 @@ public class PaasClient {
     }
   }
 
-  public static void useAVCloudCN() {
+  protected static void useAVCloudCN() {
     InternalConfigurationController.globalInstance().getAppConfiguration()
         .configureService(AVOSServices.STORAGE_SERVICE.toString(), "https://api.leancloud.cn");
     InternalConfigurationController.globalInstance().getAppConfiguration()
@@ -218,7 +218,7 @@ public class PaasClient {
     switchPushRouter("useAVOSCloudCN");
   }
 
-  public static void useLocalStg() {
+  protected static void useLocalStg() {
     InternalConfigurationController.globalInstance().getAppConfiguration()
         .configureService(AVOSServices.STORAGE_SERVICE.toString(), "https://cn-stg1.avoscloud.com");
     InternalConfigurationController.globalInstance().getAppConfiguration()
