@@ -1,8 +1,5 @@
 package com.avos.avoscloud;
 
-import com.alibaba.fastjson.JSON;
-import com.avos.avoscloud.internal.InternalConfigurationController;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.alibaba.fastjson.JSON;
+import com.avos.avoscloud.internal.InternalConfigurationController;
 
 /**
  * <p>
@@ -99,7 +99,7 @@ public class AVQuery<T extends AVObject> {
   QueryConditions conditions;
 
   // getter/setter for fastjson.
-  public AVQuery() {
+  private AVQuery() {
     super();
   }
 
