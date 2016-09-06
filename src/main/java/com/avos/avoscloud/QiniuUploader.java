@@ -1,15 +1,5 @@
 package com.avos.avoscloud;
 
-import com.alibaba.fastjson.JSON;
-import com.avos.avoscloud.internal.InternalConfigurationController;
-import com.avos.avoscloud.okhttp.Call;
-import com.avos.avoscloud.okhttp.MediaType;
-import com.avos.avoscloud.okhttp.Request;
-import com.avos.avoscloud.okhttp.RequestBody;
-import com.avos.avoscloud.okhttp.Response;
-import com.avos.avoscloud.FileUploader.ProgressCalculator;
-import com.avos.avoscloud.FileUploader.FileUploadProgressCallback;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +7,17 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.zip.CRC32;
+
+import com.alibaba.fastjson.JSON;
+import com.avos.avoscloud.FileUploader.FileUploadProgressCallback;
+import com.avos.avoscloud.FileUploader.ProgressCalculator;
+import com.avos.avoscloud.internal.InternalConfigurationController;
+import com.avos.avoscloud.okhttp.Call;
+import com.avos.avoscloud.okhttp.MediaType;
+import com.avos.avoscloud.okhttp.Request;
+import com.avos.avoscloud.okhttp.RequestBody;
+import com.avos.avoscloud.okhttp.Response;
 
 /**
  * User: summer,dennis Date: 13-4-15 Time: PM4:12
@@ -289,6 +290,8 @@ class QiniuUploader extends HttpClientUploader {
           QiniuBlockResponseData respData =
               parseQiniuResponse(getOKHttpClient().newCall(builder.build()).execute(),
                   QiniuBlockResponseData.class);
+          validateCrc32Value(respData, data, blockOffset * BLOCK_SIZE + chunkData.offset,
+              nextChunkSize);
           if (respData != null) {
             if (respData.offset < currentBlockLength) {
               return putFileBlocksToQiniu(blockOffset, data, respData, DEFAULT_RETRY_TIMES);
@@ -311,6 +314,15 @@ class QiniuUploader extends HttpClientUploader {
       return null;
     }
 
+    private void validateCrc32Value(QiniuBlockResponseData respData, byte[] data, int offset,
+        int nextChunkSize) throws AVException {
+      CRC32 crc32 = new CRC32();
+      crc32.update(data, offset, nextChunkSize);
+      long localCRC32 = crc32.getValue();
+      if (respData != null && respData.crc32 != localCRC32) {
+        throw new AVException(AVException.OTHER_CAUSE, "CRC32 validation failure for chunk upload");
+      }
+    }
 
     private int getCurrentBlockSize(byte[] bytes, int blockOffset) {
       return (bytes.length - blockOffset * BLOCK_SIZE) > BLOCK_SIZE ? BLOCK_SIZE
