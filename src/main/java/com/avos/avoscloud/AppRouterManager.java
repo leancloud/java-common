@@ -34,6 +34,8 @@ public class AppRouterManager {
 
   private static final String DEFAULT_QCLOUD_API_SERVER = "https://e1-api.leancloud.cn";
 
+  protected static final String DEFAULT_US_API_SERVER = "https://us-api.leancloud.cn";
+
   /**
    * cn 节点（注意，只有 cn 节点）默认的 router 地址
    */
@@ -173,7 +175,7 @@ public class AppRouterManager {
                         .savePersistentSettingLong(routerSharePreferenceName,
                             LATEST_UPDATE_TIME_KEY, System.currentTimeMillis());
 
-                    PaasClient.updateAPIServerWhenCN(apiServer);
+                    PaasClient.updateAPIServer(apiServer);
                   }
                 }
               } else {
@@ -209,7 +211,7 @@ public class AppRouterManager {
             .getInternalPersistence()
             .getPersistentSettingString(routerSharePreferenceName, API_SERVER_KEY,
                 getRouterServer());
-    PaasClient.updateAPIServerWhenCN(apiServer);
+    PaasClient.updateAPIServer(apiServer);
   }
 
   /**

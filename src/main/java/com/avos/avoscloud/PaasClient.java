@@ -2,7 +2,6 @@ package com.avos.avoscloud;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.CookieHandler;
 import java.net.URI;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 
 import com.alibaba.fastjson.JSON;
-import com.avos.avoscloud.internal.AppConfiguration;
 import com.avos.avoscloud.internal.InternalCache;
 import com.avos.avoscloud.internal.InternalConfigurationController;
 import com.avos.avoscloud.okhttp.Call;
@@ -177,52 +175,30 @@ public class PaasClient {
     }
   }
 
-  private static void switchPushRouter(String routerServer) {
-    if (AVUtils.isAndroid()) {
-      try {
-        Class<?> avPushRouterClass = Class.forName("com.avos.avospush.push.AVPushRouter");
-        Method switchMethod = avPushRouterClass.getMethod(routerServer);
-        switchMethod.invoke(avPushRouterClass);
-      } catch (Exception e) {
-        if (InternalConfigurationController.globalInstance().getInternalLogger()
-            .showInternalDebugLog()) {
-          LogUtil.avlog.i("avpushRouter server didn't switched");
-        }
-      }
-    }
-  }
-
-  protected static void useAVCloudUS() {
+  public static void useAVCloudUS() {
     isCN = false;
-    InternalConfigurationController.globalInstance().getAppConfiguration()
-        .configureService(AVOSServices.STORAGE_SERVICE.toString(), "https://us-api.leancloud.cn");
-    InternalConfigurationController.globalInstance().getAppConfiguration()
-        .setStorageType(AppConfiguration.StorageType.StorageTypeS3);
-    switchPushRouter("useAVOSCloudUS");
   }
 
-  protected static void updateAPIServerWhenCN(String apiServer) {
+  protected static void updateAPIServer(String apiServer) {
     if (isCN) {
       InternalConfigurationController.globalInstance().getAppConfiguration()
           .configureService(AVOSServices.STORAGE_SERVICE.toString(), apiServer);
-      InternalConfigurationController.globalInstance().getAppConfiguration()
-          .configureService(AVOSServices.STORAGE_SERVICE.toString(), apiServer);
+    } else {
+      InternalConfigurationController
+          .globalInstance()
+          .getAppConfiguration()
+          .configureService(AVOSServices.STORAGE_SERVICE.toString(),
+              AppRouterManager.DEFAULT_US_API_SERVER);
     }
   }
 
-  protected static void useAVCloudCN() {
-    InternalConfigurationController.globalInstance().getAppConfiguration()
-        .configureService(AVOSServices.STORAGE_SERVICE.toString(), "https://api.leancloud.cn");
-    InternalConfigurationController.globalInstance().getAppConfiguration()
-        .setStorageType(AppConfiguration.StorageType.StorageTypeQiniu);
-    switchPushRouter("useAVOSCloudCN");
+  public static void useAVCloudCN() {
+    isCN = true;
   }
 
   protected static void useLocalStg() {
     InternalConfigurationController.globalInstance().getAppConfiguration()
         .configureService(AVOSServices.STORAGE_SERVICE.toString(), "https://cn-stg1.avoscloud.com");
-    InternalConfigurationController.globalInstance().getAppConfiguration()
-        .setStorageType(AppConfiguration.StorageType.StorageTypeQiniu);
   }
 
   public String buildUrl(final String path) {
