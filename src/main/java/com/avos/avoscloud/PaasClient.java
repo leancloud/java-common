@@ -179,10 +179,16 @@ public class PaasClient {
     isCN = false;
   }
 
-  protected static void updateAPIServerWhenCN(String apiServer) {
+  protected static void updateAPIServer(String apiServer) {
     if (isCN) {
       InternalConfigurationController.globalInstance().getAppConfiguration()
           .configureService(AVOSServices.STORAGE_SERVICE.toString(), apiServer);
+    } else {
+      InternalConfigurationController
+          .globalInstance()
+          .getAppConfiguration()
+          .configureService(AVOSServices.STORAGE_SERVICE.toString(),
+              AppRouterManager.DEFAULT_US_API_SERVER);
     }
   }
 
