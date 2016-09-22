@@ -14,7 +14,7 @@ public abstract class InboxStatusFindCallback extends FindCallback<AVStatus> {
   /**
    * 判断是否查询到最老的一页数据
    * 
-   * @return
+   * @return 是否已经到最后一页
    */
   public boolean isEnd() {
     return end;

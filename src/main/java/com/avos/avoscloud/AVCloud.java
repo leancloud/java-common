@@ -1,6 +1,7 @@
 package com.avos.avoscloud;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -35,7 +36,7 @@ public class AVCloud {
   /**
    * 设置调用云代码函数的测试环境或者生产环境，默认为true，也就是生产环境。
    * 
-   * @param productionMode
+   * @param productionMode 是否是生产环境
    */
   public static void setProductionMode(boolean productionMode) {
     PaasClient.cloudInstance().setProduction(productionMode);
@@ -47,9 +48,10 @@ public class AVCloud {
    * @param name The cloud function to call
    * @param params The parameters to send to the cloud function. This map can contain anything that
    *        could be placed in a AVObject except for AVObjects themselves.
-   * @return The result of the cloud call. Result may be a @{link Map}< String, ?>, AVObject,
-   *         List<?>, or any type that can be set as a field in a AVObject.
-   * @throws AVException
+   * @param <T> return type of cloud function
+   * @return The result of the cloud call. Result may be a Map, AVObject, List, or any type that can
+   *         be set as a field in a AVObject.
+   * @throws AVException cloud function call exception
    */
   public static <T> T callFunction(String name, Map<String, ?> params) throws AVException {
     final AtomicReference<T> reference = new AtomicReference<T>();
@@ -77,6 +79,7 @@ public class AVCloud {
    * @param name The cloud function to call
    * @param params The parameters to send to the cloud function. This map can contain anything that
    *        could be placed in a AVObject except for AVObjects themselves.
+   * @param <T> return type of cloud function
    * @param callback The callback that will be called when the cloud function has returned.
    */
   public static <T> void callFunctionInBackground(String name, Map<String, ?> params,
@@ -137,11 +140,32 @@ public class AVCloud {
     return newResultValue;
   }
 
+  /**
+   * Calls a cloud function as rpc call in the background. callFunction can't parse AVObject
+   * correctly since no type return for AVObject and you have to parse it manually and now you can
+   * solve this problem with rpcFunction
+   * 
+   * @param name function name
+   * @param params function params
+   * @param <T> return type of cloud function
+   * @param callback callback The callback that will be called when the cloud function has returned.
+   */
   public static <T> void rpcFunctionInBackground(String name, Object params,
       final FunctionCallback<T> callback) {
     rpcFunctionInBackground(name, params, false, callback);
   }
 
+  /**
+   * Calls a cloud function as rpc call in the background. callFunction can't parse AVObject
+   * correctly since no type return for AVObject and you have to parse it manually and now you can
+   * solve this problem with rpcFunction
+   * 
+   * @param name function name
+   * @param params function params
+   * @param <T> return type of cloud function
+   * @return the result of cloud function executed remotely
+   * @throws AVException cloud function exception
+   */
   public static <T> T rpcFunction(String name, Object params) throws AVException {
     final AtomicReference<T> reference = new AtomicReference<T>();
     rpcFunctionInBackground(name, params, true, new FunctionCallback<T>() {

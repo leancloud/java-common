@@ -57,7 +57,7 @@ public class AppRouterManager {
   /**
    * 获取 api server
    *
-   * @return
+   * @return API服务器地址
    */
   public String getAPIServer() {
     if (AVUtils.isBlankContent(apiServer)) {
@@ -70,7 +70,7 @@ public class AppRouterManager {
   /**
    * 获取 router server
    *
-   * @return
+   * @return 返回推送路由地址
    */
   public String getRouterServer() {
     if (AVUtils.isBlankContent(routerServer)) {
@@ -84,7 +84,7 @@ public class AppRouterManager {
   /**
    * 更新 router url 有可能因为测试或者 301 等原因需要运行过程中修改 url
    *
-   * @param router
+   * @param router 路由服务器
    * @param persistence 是否需要持久化存储到本地 为 true 则存到本地，app 下次打开后仍有效果，否则仅当次声明周期内有效
    */
   public void updateRouterServer(String router, boolean persistence) {
@@ -101,7 +101,7 @@ public class AppRouterManager {
   /**
    * 更新 api url 有可能因为测试或者 301 等原因需要运行过程中修改 url
    *
-   * @param server
+   * @param server 服务器地址
    * @param persistence 是否需要持久化存储到本地 为 true 则存到本地，app 下次打开后仍有效果，否则仅当次声明周期内有效
    */
   public void updateAPIServer(String server, boolean persistence) {
@@ -218,7 +218,7 @@ public class AppRouterManager {
    * 添加 https 前缀 主要是因为 server 部分 url 返回数据不一致，有的有前缀，有的没有
    *
    * @param url
-   * @return
+   * @return 返回完整地址
    */
   private static String addHttpsPrefix(String url) {
     if (!AVUtils.isBlankContent(url) && !url.startsWith("http")) {
@@ -230,7 +230,7 @@ public class AppRouterManager {
   /**
    * QCloud 节点的末尾是写死的，这里根据末尾后缀判断是否为 QCloud 节点
    *
-   * @return
+   * @return 返回是否是QCloud节点
    */
   private boolean isQCloudApp(String appId) {
     return !AVUtils.isBlankContent(appId) && appId.endsWith("9Nh9j0Va");

@@ -17,7 +17,7 @@ public class AVFriendship<T extends AVUser> {
   /**
    * 获取用户的粉丝
    * 
-   * @return
+   * @return list of AVUser or subclass of AVUser
    */
   public List<T> getFollowers() {
     return followers;
@@ -30,7 +30,7 @@ public class AVFriendship<T extends AVUser> {
   /**
    * 获取用户的关注
    * 
-   * @return
+   * @return list of AVUser or subclass of AVUser
    */
   public List<T> getFollowees() {
     return followees;

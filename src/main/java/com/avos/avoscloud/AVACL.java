@@ -84,6 +84,8 @@ public class AVACL {
 
   /**
    * Get whether the public is allowed to read this object.
+   * 
+   * @return Get whether the public is allowed to read this objec
    */
   public boolean getPublicReadAccess() {
     return isReadAllowed(publicTag);
@@ -91,15 +93,20 @@ public class AVACL {
 
   /**
    * Get whether the public is allowed to write this object.
+   * 
+   * @return Get whether the public is allowed to write this object.
    */
   public boolean getPublicWriteAccess() {
     return isWriteAllowed(publicTag);
   }
 
   /**
-   * Get whether the given user id is *explicitly* allowed to read this object. Even if this returns
+   * Get whether the given user is *explicitly* allowed to read this object. Even if this returns
    * false, the user may still be able to access it if getPublicReadAccess returns true or a role
    * that the user belongs to has read access.
+   * 
+   * @param user specified user
+   * @return get whether the given user allowed to read this object
    */
   public boolean getReadAccess(AVUser user) {
     return getReadAccess(user.getObjectId());
@@ -109,6 +116,9 @@ public class AVACL {
    * Get whether the given user id is *explicitly* allowed to read this object. Even if this returns
    * false, the user may still be able to access it if getPublicReadAccess returns true or a role
    * that the user belongs to has read access.
+   * 
+   * @param userId user id
+   * @return Get whether the given user id is *explicitly* allowed to read this object
    */
   public boolean getReadAccess(String userId) {
     return isReadAllowed(userId);
@@ -172,9 +182,12 @@ public class AVACL {
   }
 
   /**
-   * Get whether the given user id is *explicitly* allowed to write this object. Even if this
-   * returns false, the user may still be able to write it if getPublicWriteAccess returns true or a
-   * role that the user belongs to has write access.
+   * Get whether the given user is *explicitly* allowed to write this object. Even if this returns
+   * false, the user may still be able to write it if getPublicWriteAccess returns true or a role
+   * that the user belongs to has write access.
+   * 
+   * @param user user to check
+   * @return Get whether the given user is *explicitly* allowed to write this object
    */
   public boolean getWriteAccess(AVUser user) {
     return getWriteAccess(user.getObjectId());
@@ -184,6 +197,9 @@ public class AVACL {
    * Get whether the given user id is *explicitly* allowed to write this object. Even if this
    * returns false, the user may still be able to write it if getPublicWriteAccess returns true or a
    * role that the user belongs to has write access.
+   * 
+   * @param userId specified user id
+   * @return get whether the given user id is *explicitly* allowed to write this object
    */
   public boolean getWriteAccess(String userId) {
     return isWriteAllowed(userId);
@@ -218,7 +234,7 @@ public class AVACL {
    * 
    * @param read whether the public is allowed to read this object
    * @param write whether the public is allowed to write this object
-   * @return
+   * @return AVACL
    */
   public static AVACL parseACLWithPublicAccess(boolean read, boolean write) {
     AVACL acl = new AVACL();
@@ -229,6 +245,8 @@ public class AVACL {
 
   /**
    * Set whether the public is allowed to read this object.
+   * 
+   * @param allowed public read permission
    */
   public void setPublicReadAccess(boolean allowed) {
     allowRead(allowed, publicTag);
@@ -236,6 +254,8 @@ public class AVACL {
 
   /**
    * Set whether the public is allowed to write this object.
+   * 
+   * @param allowed public write permission
    */
   public void setPublicWriteAccess(boolean allowed) {
     allowWrite(allowed, publicTag);
@@ -243,6 +263,9 @@ public class AVACL {
 
   /**
    * Set whether the given user id is allowed to read this object.
+   * 
+   * @param user specified user
+   * @param allowed read permission for specified user
    */
   public void setReadAccess(AVUser user, boolean allowed) {
     setReadAccess(user.getObjectId(), allowed);
@@ -250,6 +273,10 @@ public class AVACL {
 
   /**
    * Set whether the given user is allowed to read this object.
+   * 
+   * @param userId specified user id
+   * 
+   * @param allowed read permission for specified user
    */
   public void setReadAccess(String userId, boolean allowed) {
     allowRead(allowed, userId);
@@ -301,6 +328,9 @@ public class AVACL {
 
   /**
    * Set whether the given user is allowed to write this object.
+   * 
+   * @param user specified user
+   * @param allowed write permission for specified user
    */
   public void setWriteAccess(AVUser user, boolean allowed) {
     setWriteAccess(user.getObjectId(), allowed);
@@ -308,6 +338,9 @@ public class AVACL {
 
   /**
    * Set whether the given user id is allowed to write this object.
+   * 
+   * @param userId specified user id
+   * @param allowed write permission for specified user
    */
   public void setWriteAccess(String userId, boolean allowed) {
     allowWrite(allowed, userId);

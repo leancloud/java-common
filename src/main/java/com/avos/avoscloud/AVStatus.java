@@ -1,16 +1,24 @@
 package com.avos.avoscloud;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import android.os.Parcel;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONType;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * Created with IntelliJ IDEA. User: zhuzeng Date: 12/25/13 Time: 9:58 AM To change this template
@@ -978,9 +986,9 @@ public class AVStatus extends AVObject {
   /**
    * 返回一个AVStatusQuery对象，用来查询用户收件箱内容
    * 
-   * @param owner
-   * @param inBoxType
-   * @return
+   * @param owner 收件箱的拥有者
+   * @param inBoxType 收件箱类型
+   * @return AVStatusQuery
    */
   public static AVStatusQuery inboxQuery(AVUser owner, String inBoxType) {
     AVStatusQuery query = new AVStatusQuery();
@@ -992,6 +1000,8 @@ public class AVStatus extends AVObject {
 
   /**
    * 此方法并没有实现，调用会抛出UnsupportedOperationException
+   * 
+   * @deprecated
    */
   @Deprecated
   @Override
@@ -1001,6 +1011,8 @@ public class AVStatus extends AVObject {
 
   /**
    * 此方法并没有实现，调用会抛出UnsupportedOperationException
+   * 
+   * @deprecated
    */
   @Deprecated
   @Override
@@ -1010,6 +1022,8 @@ public class AVStatus extends AVObject {
 
   /**
    * 此方法并没有实现，调用会抛出UnsupportedOperationException
+   * 
+   * @deprecated
    */
   @Deprecated
   @Override
@@ -1019,6 +1033,8 @@ public class AVStatus extends AVObject {
 
   /**
    * 此方法并没有实现，调用会抛出UnsupportedOperationException
+   * 
+   * @deprecated
    */
   @Deprecated
   @Override
@@ -1028,6 +1044,8 @@ public class AVStatus extends AVObject {
 
   /**
    * 此方法并没有实现，调用会抛出UnsupportedOperationException
+   * 
+   * @deprecated
    */
   @Deprecated
   @Override

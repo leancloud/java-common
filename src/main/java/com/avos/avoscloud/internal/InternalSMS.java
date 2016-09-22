@@ -26,7 +26,7 @@ public class InternalSMS {
    * @param name　应用名,值为null 则默认是您的应用名
    * @param op　　验证码的目标操作，值为null,则默认为“短信验证”
    * @param ttl　验证码过期时间,单位分钟。如果是0，则默认为10分钟
-   * 
+   * @throws AVException 请求异常
    */
   public static void requestSMSCode(String phone, String name, String op, int ttl)
       throws AVException {
@@ -90,7 +90,7 @@ public class InternalSMS {
    * @param name　应用名,值为null 则默认是您的应用名
    * @param op　　验证码的目标操作，值为null,则默认为“短信验证”
    * @param ttl　验证码过期时间,单位分钟。如果是0，则默认为10分钟
-   *
+   * @param callback 请求成功以后 callback.done(e)会被调用
    */
   public static void requestSMSCodeInBackground(String phone, String name, String op, int ttl,
       RequestMobileCodeCallback callback) {
@@ -101,12 +101,12 @@ public class InternalSMS {
    * 通过短信模板来发送短信验证码
    * 
    * 请在异步任务中调用本方法,或者调用 public static void requestSMSCodeInBackground(String phone, String template,
-   * Map<String, Object> env, RequestMobileCodeCallback callback)
+   * Map env, RequestMobileCodeCallback callback)
    * 
    * @param phone 目标手机号码(必选)
    * @param templateName 短信模板名称
    * @param env 需要注入的变量env
-   * @throws AVException
+   * @throws AVException 请求异常
    */
   public static void requestSMSCode(String phone, String templateName, Map<String, Object> env)
       throws AVException {
@@ -140,7 +140,7 @@ public class InternalSMS {
    * @param phone 目标手机号码(必选)
    * @param templateName 短信模板名称
    * @param env 需要注入的变量env
-   * @param callback
+   * @param callback 请求完成以后 callback.done(e)会被调用
    */
   public static void requestSMSCodeInBackground(String phone, String templateName,
       Map<String, Object> env, RequestMobileCodeCallback callback) {
@@ -192,6 +192,7 @@ public class InternalSMS {
    * 
    * @param phone　目标手机号码
    * 
+   * @throws AVException 请求异常
    */
   public static void requestSMSCode(String phone) throws AVException {
     requestSMSCode(phone, null, null, 0);
@@ -209,7 +210,7 @@ public class InternalSMS {
    *
    *
    * @param phone　目标手机号码
-   *
+   * @param callback 请求成功以后，会调用 callback.done(e)
    */
   public static void requestSMSCodeInBackground(String phone, RequestMobileCodeCallback callback) {
     requestSMSCodeInBackgroud(phone, null, null, 0, callback);
@@ -219,7 +220,7 @@ public class InternalSMS {
    * 请求发送语音验证码，验证码会以电话形式打给目标手机
    *
    * @param phoneNumber 目标手机号
-   * @throws AVException
+   * @throws AVException 请求异常
    */
   public static void requestVoiceCode(String phoneNumber) throws AVException {
     requestVoiceCode(phoneNumber, null);
@@ -230,7 +231,7 @@ public class InternalSMS {
    * 
    * @param phoneNumber 目标手机号
    * @param idd 电话的国家区号
-   * @throws AVException
+   * @throws AVException 请求异常
    */
 
   public static void requestVoiceCode(String phoneNumber, String idd) throws AVException {
@@ -257,7 +258,7 @@ public class InternalSMS {
    * 请求发送语音验证码，验证码会以电话形式打给目标手机
    * 
    * @param phoneNumber 目标手机号
-   * @param callback
+   * @param callback 请求成功以后，会调用 callback.done(e)
    */
   public static void requestVoiceCodeInBackground(String phoneNumber,
       RequestMobileCodeCallback callback) {
@@ -269,7 +270,7 @@ public class InternalSMS {
    * 
    * @param phoneNumber 目标手机号
    * @param idd 电话的国家区号
-   * @param callback
+   * @param callback 请求成功以后，会调用 callback.done(e)
    */
   private static void requestVoiceCodeInBackground(String phoneNumber, String idd,
       RequestMobileCodeCallback callback) {
@@ -281,7 +282,7 @@ public class InternalSMS {
    * 
    * @param code 验证码
    * @param mobilePhoneNumber 手机号码
-   * @throws AVException
+   * @throws AVException 请求异常
    */
   public static void verifySMSCode(String code, String mobilePhoneNumber) throws AVException {
     verifySMSCodeInBackground(code, mobilePhoneNumber, true, new AVMobilePhoneVerifyCallback() {
@@ -307,7 +308,7 @@ public class InternalSMS {
    *
    * @param code 验证码
    * @param mobilePhoneNumber 手机号码
-   * @throws AVException
+   * @throws AVException 请求异常
    */
   public static void verifyCode(String code, String mobilePhoneNumber) throws AVException {
     verifySMSCode(code, mobilePhoneNumber);
@@ -318,7 +319,7 @@ public class InternalSMS {
    * 
    * @param code 验证码
    * @param mobilePhoneNumber 手机号
-   * @param callback
+   * @param callback 请求成功以后，会调用 callback.done(e)
    */
   public static void verifySMSCodeInBackground(String code, String mobilePhoneNumber,
       AVMobilePhoneVerifyCallback callback) {
@@ -330,7 +331,7 @@ public class InternalSMS {
    *
    * @param code 验证码
    * @param mobilePhoneNumber 手机号
-   * @param callback
+   * @param callback 请求成功以后，会调用 callback.done(e)
    */
   public static void verifyCodeInBackground(String code, String mobilePhoneNumber,
       AVMobilePhoneVerifyCallback callback) {

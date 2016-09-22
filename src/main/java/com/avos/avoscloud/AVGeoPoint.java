@@ -36,6 +36,7 @@ public class AVGeoPoint {
    * Get distance between this point and another geopoint in kilometers.
    * 
    * @param point GeoPoint describing the other point being measured against.
+   * @return distance between two geo points
    */
   public double distanceInKilometersTo(AVGeoPoint point) {
     float[] mResults = new float[2];
@@ -45,9 +46,10 @@ public class AVGeoPoint {
   }
 
   /**
-   * Get distance between this point and another geopoint in kilometers.
+   * Get distance between this point and another geopoint in miles.
    * 
    * @param point GeoPoint describing the other point being measured against.
+   * @return distance between two geo points
    */
   public double distanceInMilesTo(AVGeoPoint point) {
     return this.distanceInKilometersTo(point) / ONE_KM_TO_MILES;
@@ -58,6 +60,7 @@ public class AVGeoPoint {
    * distance between the two points.
    * 
    * @param point GeoPoint describing the other point being measured against.
+   * @return distance between two geo points
    */
   public double distanceInRadiansTo(AVGeoPoint point) {
     return this.distanceInKilometersTo(point) / EARTH_MEAN_RADIUS_KM;
@@ -76,6 +79,8 @@ public class AVGeoPoint {
 
   /**
    * Get latitude.
+   * 
+   * @return latitude
    */
   public double getLatitude() {
     return latitude;
@@ -92,6 +97,8 @@ public class AVGeoPoint {
 
   /**
    * Get longitude.
+   * 
+   * @return longitude
    */
   public double getLongitude() {
     return longitude;

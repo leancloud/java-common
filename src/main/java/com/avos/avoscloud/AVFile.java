@@ -1,16 +1,15 @@
 package com.avos.avoscloud;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.alibaba.fastjson.annotation.JSONField;
 import com.avos.avoscloud.internal.AppConfiguration.StorageType;
 import com.avos.avoscloud.internal.InternalConfigurationController;
 import com.avos.avoscloud.internal.InternalFileDownloader;
 import com.avos.avoscloud.utils.MimeTypeMap;
-import com.alibaba.fastjson.annotation.JSONField;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -22,7 +21,6 @@ import java.util.Map;
  * it as a field on a AVObject.
  * </p>
  * Example:
- * <p/>
  * 
  * <pre>
  * AVFile file = new AVFile(&quot;hello&quot;.getBytes());
@@ -155,9 +153,6 @@ public final class AVFile {
     this.metaData.put(FILE_NAME_KEY, name);
   }
 
-  /**
-   * @hide For internal use only.
-   */
   protected AVFile(String name, String url) {
     super();
 
@@ -235,9 +230,10 @@ public final class AVFile {
    * Retrieve a AVFile object by object id from AVOSCloud.If the file is not found,it will throw
    * java.io.FileNotFoundException.
    *
-   * @param objectId
-   * @return
-   * @throws AVException ,FileNotFoundException
+   * @param objectId objectId in _File table
+   * @return AVFile AVFile instance
+   * @throws AVException exception if _File table object failed to transfer to AVFile object
+   * @throws FileNotFoundException exception if objectId is not invalid
    * @since 1.3.4
    * @deprecated Please use #{@link #withObjectId(String)}
    */
@@ -251,9 +247,10 @@ public final class AVFile {
    * Retrieve a AVFile object by object id from AVOSCloud.If the file is not found,it will throw
    * java.io.FileNotFoundException.
    *
-   * @param objectId
-   * @return
-   * @throws AVException ,FileNotFoundException
+   * @param objectId objectId in _File table
+   * @return AVFile AVFile instance
+   * @throws AVException excpetion if _File table object failed to transfer to AVFile object
+   * @throws FileNotFoundException exception if objectId is not invalid
    * @since 2.0.2
    */
   public static AVFile withObjectId(String objectId) throws AVException, FileNotFoundException {
@@ -321,6 +318,8 @@ public final class AVFile {
    *
    * @param name The file's name, ideally with extension.
    * @param absoluteLocalFilePath The file's absolute path.
+   * @return AVFile AVFile instance
+   * @throws Exception exception if file not found on path
    * @deprecated Please use #{@link #withAbsoluteLocalPath(String, String)}
    */
   @Deprecated
@@ -336,6 +335,8 @@ public final class AVFile {
    *
    * @param name The file's name, ideally with extension.
    * @param absoluteLocalFilePath The file's absolute path.
+   * @return AVFile AVFile instance
+   * @throws FileNotFoundException exception if file not found
    * @since 2.0.2
    */
   public static AVFile withAbsoluteLocalPath(String name, String absoluteLocalFilePath)
@@ -348,9 +349,8 @@ public final class AVFile {
    *
    * @param name The file's name, ideally with extension.
    * @param file The file object.
-   * @return
+   * @return AVFile AVFile instance
    * @throws FileNotFoundException
-   * @throws IOException
    * @since 1.3.4
    * @deprecated Please use #{@link #withFile(String, File)}
    */
@@ -364,9 +364,8 @@ public final class AVFile {
    *
    * @param name The file's name, ideally with extension.
    * @param file The file object.
-   * @return
-   * @throws FileNotFoundException
-   * @throws IOException
+   * @return AVFile AVFile instance
+   * @throws FileNotFoundException exception if file not found
    * @since 2.0.2
    */
   public static AVFile withFile(String name, File file) throws FileNotFoundException {
@@ -482,7 +481,7 @@ public final class AVFile {
   }
 
   /**
-   * @return
+   * @return get file name
    */
   public String getOriginalName() {
     return (String) metaData.get(FILE_NAME_KEY);
@@ -519,6 +518,8 @@ public final class AVFile {
 
   /**
    * Whether the file has available data.
+   * 
+   * @return Whether the file has available data.
    */
   @Deprecated
   public boolean isDataAvailable() {
@@ -541,10 +542,10 @@ public final class AVFile {
   /**
    * Returns a thumbnail image url using QiNiu endpoints.
    *
-   * @param scaleToFit
-   * @param width
-   * @param height
-   * @return
+   * @param scaleToFit Whether to scale the image
+   * @param width The thumbnail image's width
+   * @param height The thumbnail image'height
+   * @return thumbnail url
    * @see #getThumbnailUrl(boolean, int, int, int, String)
    */
   public String getThumbnailUrl(boolean scaleToFit, int width, int height) {
@@ -559,7 +560,7 @@ public final class AVFile {
    * @param height The thumbnail image'height
    * @param quality The thumbnail image quality in 1 - 100.
    * @param fmt The thumbnail image format such as 'jpg','gif','png','tif' etc.
-   * @return
+   * @return thumbnail url
    */
   public String getThumbnailUrl(boolean scaleToFit, int width, int height, int quality, String fmt) {
     if (InternalConfigurationController.globalInstance().getAppConfiguration().getStorageType() != StorageType.StorageTypeQiniu) {
@@ -591,7 +592,7 @@ public final class AVFile {
   /**
    * Saves the file to the AVOSCloud cloud synchronously.
    *
-   * @throws AVException
+   * @throws AVException exception during save
    */
   public void save() throws AVException {
     // 如果文件已经上传过，则不再进行上传
@@ -652,8 +653,10 @@ public final class AVFile {
    * Synchronously gets the data for this object. You probably want to use
    * AVFile.getDataInBackground(com.parse.GetDataCallback, com.parse.ProgressCallback) instead
    * unless you're already in a background thread.
-   *
-   * @throws AVException
+   * 
+   * @return file data
+   * 
+   * @throws AVException exception during file data retrieve
    */
   @Deprecated
   @JSONField(serialize = false)
@@ -776,7 +779,7 @@ public final class AVFile {
   }
 
   /**
-   * @throws AVException
+   * @throws AVException exception during delete
    * @see AVObject#delete()
    * @since 1.3.4
    */
@@ -798,8 +801,8 @@ public final class AVFile {
   }
 
   /**
-   * @param callback
-   * @see AVObject#deleteEventually(DeleteCallback callback);
+   * @param callback callback
+   * @see AVObject#deleteEventually(DeleteCallback callback)
    * @since 1.3.4
    */
   public void deleteEventually(DeleteCallback callback) {
@@ -808,7 +811,7 @@ public final class AVFile {
   }
 
   /**
-   * @see AVObject#deleteInBackground();
+   * @see AVObject#deleteInBackground()
    * @since 1.3.4
    */
   public void deleteInBackground() {
@@ -817,8 +820,8 @@ public final class AVFile {
   }
 
   /**
-   * @param callback
-   * @see AVObject#deleteInBackground(DeleteCallback callback);
+   * @param callback callback.done(e) is called when the delete completes
+   * @see AVObject#deleteInBackground(DeleteCallback callback)
    * @since 1.3.4
    */
   public void deleteInBackground(DeleteCallback callback) {
@@ -909,6 +912,7 @@ public final class AVFile {
   /**
    * 获取AVFile的ACL
    *
+   * @return AVACL for AVFile object
    * @since 2.6.9
    */
   protected AVACL getACL() {

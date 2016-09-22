@@ -171,6 +171,8 @@ public class AVQuery<T extends AVObject> {
 
   /**
    * Accessor for the class name.
+   * 
+   * @return class name of query
    */
   public String getClassName() {
     return className;
@@ -193,6 +195,8 @@ public class AVQuery<T extends AVObject> {
 
   /**
    * Accessor for the caching policy.
+   * 
+   * @return cache policy
    */
   public CachePolicy getCachePolicy() {
     return cachePolicy;
@@ -201,6 +205,7 @@ public class AVQuery<T extends AVObject> {
   /**
    * Change the caching policy of this query.
    *
+   * @param cachePolicy caching policy for query
    * @return this query.
    */
   public AVQuery<T> setCachePolicy(CachePolicy cachePolicy) {
@@ -215,8 +220,10 @@ public class AVQuery<T extends AVObject> {
   /**
    * Change the caching policy of this query.
    *
+   * @param cachePolicy caching policy for query
    * @return this query.
    */
+  @Deprecated
   public AVQuery<T> setPolicy(CachePolicy policy) {
     this.cachePolicy = policy;
     return this;
@@ -225,6 +232,8 @@ public class AVQuery<T extends AVObject> {
   /**
    * Gets the maximum age of cached data that will be considered in this query. The returned value
    * is in milliseconds
+   * 
+   * @return maxCacheAge
    */
   public long getMaxCacheAge() {
     return maxCacheAge;
@@ -233,6 +242,7 @@ public class AVQuery<T extends AVObject> {
   /**
    * Sets the maximum age of cached data that will be considered in this query.
    *
+   * @param maxCacheAge set maxCacheAge for query cache
    * @return this query.
    */
   public AVQuery<T> setMaxCacheAge(long maxCacheAge) {
@@ -248,6 +258,7 @@ public class AVQuery<T extends AVObject> {
    * Turn on performance tracing of finds. If performance tracing is already turned on this does
    * nothing. In general you don't need to call trace.
    *
+   * @param trace switch for performance tracing
    * @return this query.
    */
   public AVQuery<T> setTrace(boolean trace) {

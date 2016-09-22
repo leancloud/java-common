@@ -8,7 +8,7 @@ import com.avos.avoscloud.AVUtils;
 /**
  * A put object operation
  * 
- * @author dennis<xzhuang@avos.com>
+ * @author dennis xzhuang@avos.com
  * 
  */
 public class SetOp extends BaseOp implements SingleValueOp {

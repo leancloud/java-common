@@ -7,7 +7,7 @@ import com.avos.avoscloud.AVUtils;
 /**
  * A delete op
  * 
- * @author dennis<xzhuang@avos.com>
+ * @author dennis xzhuang@avos.com
  * 
  */
 public class DeleteOp extends BaseOp {

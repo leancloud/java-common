@@ -17,7 +17,7 @@ public class InternalDate {
   /**
    * 获取服务器端当前时间
    * 
-   * @param callback
+   * @param callback 请求成功以后,会调用 callback.done(date,e)
    */
   public static void getServerDateInBackground(AVServerDateCallback callback) {
     getServerDateInBackground(false, callback);
@@ -26,8 +26,8 @@ public class InternalDate {
   /**
    * 获取服务器端当前时间
    * 
-   * @return
-   * @throws AVException
+   * @return 服务器时间
+   * @throws AVException 请求异常
    */
   public static Date getServerDate() throws AVException {
     final Date[] results = {null};

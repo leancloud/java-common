@@ -19,9 +19,9 @@ import java.util.List;
  * function depending on whether the fetch succeeded or not.
  * </p>
  * 
- * AVQuery<AVObject> query = AVQuery.getQuery("MyClass"); query.findInBackground(new
- * FindCallback<AVObject>() { public void done(List<AVObject> objects, AVException e) { if (e ==
- * null) { objectsWereRetrievedSuccessfully(objects); } else { objectRetrievalFailed(); } } });
+ * AVQuery query = AVQuery.getQuery("MyClass"); query.findInBackground(new FindCallback() { public
+ * void done(List objects, AVException e) { if (e == null) {
+ * objectsWereRetrievedSuccessfully(objects); } else { objectRetrievalFailed(); } } });
  */
 
 public abstract class FindCallback<T extends AVObject> extends AVCallback<java.util.List<T>> {
