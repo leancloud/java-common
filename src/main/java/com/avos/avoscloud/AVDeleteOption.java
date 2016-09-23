@@ -9,8 +9,8 @@ public class AVDeleteOption {
   /**
    * Only delete object when query matches AVObject instance data
    *
-   * @param query
-   * @return
+   * @param query 用于匹配当前对象，只有满足才删除当前对象
+   * @return AVDeleteOption 返回对象本身
    */
 
   public AVDeleteOption query(AVQuery query) {

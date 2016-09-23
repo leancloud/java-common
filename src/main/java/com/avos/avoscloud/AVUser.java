@@ -137,6 +137,7 @@ public class AVUser extends AVObject {
    * if necessary.
    * 
    * @param userClass subclass.
+   * @param <T> subclass of AVUser or AVUser
    * @return The currently logged in AVUser subclass instance.
    */
   @SuppressWarnings("unchecked")
@@ -161,6 +162,8 @@ public class AVUser extends AVObject {
 
   /**
    * Retrieves the email address.
+   * 
+   * @return user email
    */
   public String getEmail() {
     return this.email;
@@ -168,6 +171,10 @@ public class AVUser extends AVObject {
 
   /**
    * Constructs a query for AVUsers subclasses.
+   * 
+   * @param clazz class type of AVUser subclass for query
+   * @param <T> subclass of AVUser
+   * @return query of AVUser
    */
   public static <T extends AVUser> AVQuery<T> getUserQuery(Class<T> clazz) {
     AVQuery<T> query = new AVQuery<T>(userClassName(), clazz);
@@ -176,6 +183,8 @@ public class AVUser extends AVObject {
 
   /**
    * Constructs a query for AVUsers.
+   * 
+   * @return AVQuery for AVUser
    */
   public static AVQuery<AVUser> getQuery() {
     return getQuery(AVUser.class);
@@ -191,6 +200,8 @@ public class AVUser extends AVObject {
 
   /**
    * Retrieves the username.
+   * 
+   * @return get username
    */
   public String getUsername() {
     return username;
@@ -200,6 +211,8 @@ public class AVUser extends AVObject {
    * Whether the AVUser has been authenticated on this device. This will be true if the AVUser was
    * obtained via a logIn or signUp method. Only an authenticated AVUser can be saved (with altered
    * attributes) and deleted.
+   * 
+   * @return Whether the AVUser has been authenticated
    */
   public boolean isAuthenticated() {
     return (!AVUtils.isBlankString(sessionToken) || !AVUtils.isBlankString(sinaWeiboToken) || !AVUtils
@@ -219,6 +232,8 @@ public class AVUser extends AVObject {
    * Indicates whether this AVUser was created during this session through a call to AVUser.signUp()
    * or by logging in with a linked service such as Facebook.
    * </p>
+   * 
+   * @return Whether this AVUser is new created
    */
   public boolean isNew() {
     return isNew;
@@ -226,9 +241,10 @@ public class AVUser extends AVObject {
 
   /**
    * @see #logIn(String, String, Class)
-   * @param username
-   * @param password
-   * @return
+   * @param username user username
+   * @param password user password
+   * @return logined user
+   * @throws AVException login exception
    */
   public static AVUser logIn(String username, String password) throws AVException {
     return logIn(username, password, AVUser.class);
@@ -241,14 +257,16 @@ public class AVUser extends AVObject {
    * </p>
    * <p>
    * Typically, you should use AVUser.logInInBackground(java.lang.String, java.lang.String,
-   * com.parse.LogInCallback,Class<T> clazz) instead of this, unless you are managing your own
+   * com.parse.LogInCallback,Class clazz) instead of this, unless you are managing your own
    * threading.
    * </p>
    * 
    * @param username The username to log in with.
    * @param password The password to log in with.
    * @param clazz The AVUser itself or subclass.
+   * @param <T> The AVUser itself or subclass.
    * @return The user if the login was successful.
+   * @throws AVException login exception
    */
   public static <T extends AVUser> T logIn(String username, String password, Class<T> clazz)
       throws AVException {
@@ -283,9 +301,9 @@ public class AVUser extends AVObject {
 
   /**
    * @see #logInInBackground(String, String, LogInCallback, Class)
-   * @param username
-   * @param password
-   * @param callback
+   * @param username username
+   * @param password password
+   * @param callback callback.done(user, e) is called when the login completes.
    */
   public static void logInInBackground(String username, String password,
       LogInCallback<AVUser> callback) {
@@ -304,6 +322,7 @@ public class AVUser extends AVObject {
    * 
    * @param username The username to log in with.
    * @param password The password to log in with.
+   * @param <T> The AVUser itself or subclass
    * @param clazz The AVUser itself or subclass.
    * @param callback callback.done(user, e) is called when the login completes.
    */
@@ -471,10 +490,10 @@ public class AVUser extends AVObject {
    * 
    * 请不要在UI线程内调用本方法
    * 
-   * @param phone
-   * @param smsCode
-   * @return
-   * @throws AVException
+   * @param phone 收到验证码的手机号码
+   * @param smsCode 收到的验证码
+   * @return 登录用户
+   * @throws AVException 登录异常
    */
   public static AVUser loginBySMSCode(String phone, String smsCode) throws AVException {
     return loginBySMSCode(phone, smsCode, AVUser.class);
@@ -485,11 +504,12 @@ public class AVUser extends AVObject {
    * 
    * 请不要在UI线程内调用本方法
    * 
-   * @param phone
-   * @param smsCode
+   * @param phone 收到验证码的手机号码
+   * @param smsCode 收到的验证码
    * @param clazz AVUser的子类对象
-   * @return
-   * @throws AVException
+   * @param <T> AVUser的子类对象
+   * @return 登录用户
+   * @throws AVException 登录异常
    */
   public static <T extends AVUser> T loginBySMSCode(String phone, String smsCode, Class<T> clazz)
       throws AVException {
@@ -521,9 +541,9 @@ public class AVUser extends AVObject {
    * 
    * 本方法为异步方法，可以在UI线程中调用
    * 
-   * @param phone
-   * @param smsCode
-   * @param callback
+   * @param phone 收到验证码的手机号码
+   * @param smsCode 收到的验证码
+   * @param callback 在登录完成后，callback.done(user,e)会被调用
    */
   public static void loginBySMSCodeInBackground(String phone, String smsCode,
       LogInCallback<AVUser> callback) {
@@ -535,9 +555,10 @@ public class AVUser extends AVObject {
    * 
    * 本方法为异步方法，可以在UI线程中调用
    * 
-   * @param phone
-   * @param smsCode
-   * @param callback
+   * @param phone 收到验证码的手机号码
+   * @param smsCode 收到的验证码
+   * @param <T> AVUser的子类
+   * @param callback 在登录完成后，callback.done(user,e)会被调用
    * @param clazz AVUser的子类
    */
   public static <T extends AVUser> void loginBySMSCodeInBackground(String phone, String smsCode,
@@ -586,8 +607,8 @@ public class AVUser extends AVObject {
    * currently logged in user using AVUser.getCurrentUser(). Don't call this method on the UI thread
    * 
    * @param sessionToken The sessionToken to log in with
-   * @return
-   * @throws AVException
+   * @return logined user
+   * @throws AVException login exception
    */
   public static AVUser becomeWithSessionToken(String sessionToken) throws AVException {
     return becomeWithSessionToken(sessionToken, AVUser.class);
@@ -599,8 +620,10 @@ public class AVUser extends AVObject {
    * 
    * @param sessionToken The sessionToken to log in with
    * @param clazz The AVUser itself or subclass.
-   * @return
-   * @throws AVException
+   * @param <T> The AVUser itself or subclass.
+   * @return logined user
+   * 
+   * @throws AVException login exception
    */
   public static <T extends AVUser> AVUser becomeWithSessionToken(String sessionToken, Class<T> clazz)
       throws AVException {
@@ -633,7 +656,7 @@ public class AVUser extends AVObject {
    * currently logged in user using AVUser.getCurrentUser().
    * 
    * @param sessionToken The sessionToken to log in with
-   * @param callback
+   * @param callback callback.done(user,e) will be called when login completes
    */
   public static void becomeWithSessionTokenInBackground(String sessionToken,
       LogInCallback<AVUser> callback) {
@@ -645,8 +668,9 @@ public class AVUser extends AVObject {
    * currently logged in user using AVUser.getCurrentUser().
    * 
    * @param sessionToken The sessionToken to log in with
-   * @param callback
-   * @param clazz
+   * @param callback callback.done(user,e) will be called when login completes
+   * @param clazz subclass of AVUser
+   * @param <T> subclass of AVUser
    */
   public static <T extends AVUser> void becomeWithSessionTokenInBackground(String sessionToken,
       LogInCallback<T> callback, Class<T> clazz) {
@@ -697,12 +721,11 @@ public class AVUser extends AVObject {
    * 
    * 请不要在UI线程中间调用此方法
    * 
-   * @param mobilePhoneNumber
-   * @param smsCode
-   * @return
-   * @throws AVException
+   * @param mobilePhoneNumber 用户注册的手机号码
+   * @param smsCode 收到的登录验证码
+   * @return 登录用户
+   * @throws AVException 登录异常
    * @since 2.6.10
-   * @see AVOSCloud#requestSMSCode(String)
    */
   public static AVUser signUpOrLoginByMobilePhone(String mobilePhoneNumber, String smsCode)
       throws AVException {
@@ -714,13 +737,13 @@ public class AVUser extends AVObject {
    * 
    * 请不要在UI线程中间调用此方法
    * 
-   * @param mobilePhoneNumber
-   * @param smsCode
-   * @param clazz
-   * @return
-   * @throws AVException
+   * @param mobilePhoneNumber 用户注册的手机号码
+   * @param smsCode 收到的登录验证码
+   * @param clazz AVUser的子类
+   * @param <T> AVUser的子类
+   * @return 登录用户
+   * @throws AVException 登录异常
    * @since 2.6.10
-   * @see AVOSCloud#requestSMSCode(String)
    */
   public static <T extends AVUser> T signUpOrLoginByMobilePhone(String mobilePhoneNumber,
       String smsCode, Class<T> clazz) throws AVException {
@@ -752,11 +775,10 @@ public class AVUser extends AVObject {
    * 直接通过手机号码和验证码来创建或者登录用户。 如果手机号码已经存在则为登录，否则创建新用户
    * 
    * 
-   * @param mobilePhoneNumber
-   * @param smsCode
-   * @param callback
+   * @param mobilePhoneNumber 用户注册的手机号码
+   * @param smsCode 收到的登录验证码
+   * @param callback 登录或者注册成功以后,callback.done(user,e)会被调用
    * @since 2.6.10
-   * @see AVOSCloud#requestSMSCodeInBackgroud(String, RequestMobileCodeCallback)
    */
   public static void signUpOrLoginByMobilePhoneInBackground(String mobilePhoneNumber,
       String smsCode, LogInCallback<AVUser> callback) {
@@ -766,12 +788,12 @@ public class AVUser extends AVObject {
   /**
    * 直接通过手机号码和验证码来创建或者登录用户。 如果手机号码已经存在则为登录，否则创建新用户
    * 
-   * @param mobilePhoneNumber
-   * @param smsCode
+   * @param mobilePhoneNumber 用户注册的手机号码
+   * @param smsCode 收到的登录验证码
    * @param clazz AVUser的子类对象
-   * @param callback
+   * @param <T> subclass of AVUser
+   * @param callback 登录或者注册成功以后,callback.done(user,e)会被调用
    * @since 2.6.10
-   * @see AVOSCloud#requestSMSCodeInBackgroud(String, RequestMobileCodeCallback)
    */
 
   public static <T extends AVUser> void signUpOrLoginByMobilePhoneInBackground(
@@ -940,6 +962,10 @@ public class AVUser extends AVObject {
    * 同步方法调用修改用户当前的密码
    * 
    * 您需要保证用户有效的登录状态
+   * 
+   * @param oldPassword 原来的密码
+   * @param newPassword 新密码
+   * @throws AVException updatePassword exception
    */
   public void updatePassword(String oldPassword, String newPassword) throws AVException {
     updatePasswordInBackground(oldPassword, newPassword, new UpdatePasswordCallback() {
@@ -965,6 +991,10 @@ public class AVUser extends AVObject {
    * 异步方法调用修改用户当前的密码
    * 
    * 您需要保证用户有效的登录状态
+   * 
+   * @param oldPassword 原来的密码
+   * @param newPassword 新密码
+   * @param callback 密码更新以后 callback.done(e)会被调用
    */
   public void updatePasswordInBackground(String oldPassword, String newPassword,
       UpdatePasswordCallback callback) {
@@ -1005,6 +1035,8 @@ public class AVUser extends AVObject {
    * 请确保是在异步程序中调用此方法，否则请调用 requestPasswordResetBySmsCodeInBackground(String
    * mobilePhoneNumber,RequestMobileCodeCallback callback)方法
    * 
+   * @param mobilePhoneNumber 用户注册时的手机号码
+   * @throws AVException 如果找不到手机号码对应的用户时抛出的异常
    */
 
   public static void requestPasswordResetBySmsCode(String mobilePhoneNumber) throws AVException {
@@ -1030,6 +1062,8 @@ public class AVUser extends AVObject {
   /**
    * 申请通过短信重置用户密码
    * 
+   * @param mobilePhoneNumber 用户注册时的手机号码
+   * @param callback 密码重置成功以后会调用 callback.done(e)
    * 
    */
   public static void requestPasswordResetBySmsCodeInBackground(String mobilePhoneNumber,
@@ -1075,9 +1109,9 @@ public class AVUser extends AVObject {
    * 请确保是在异步方法中调用本方法否则请调用resetPasswordBySmsCodeInBackground(String smsCode, String newPassword,
    * UpdatePasswordCallback callback) 方法
    * 
-   * @param smsCode
-   * @param newPassword
-   * @throws AVException
+   * @param smsCode 验证码
+   * @param newPassword 新密码
+   * @throws AVException 验证码错误异常
    */
   public static void resetPasswordBySmsCode(String smsCode, String newPassword) throws AVException {
     resetPasswordBySmsCodeInBackground(smsCode, newPassword, true, new UpdatePasswordCallback() {
@@ -1101,9 +1135,9 @@ public class AVUser extends AVObject {
   /**
    * 通过短信验证码更新用户密码
    * 
-   * @param smsCode
-   * @param newPassword
-   * @param callback
+   * @param smsCode 验证码
+   * @param newPassword 新密码
+   * @param callback 密码重置成功以后会调用 callback.done(e)
    */
   public static void resetPasswordBySmsCodeInBackground(String smsCode, String newPassword,
       UpdatePasswordCallback callback) {
@@ -1206,7 +1240,8 @@ public class AVUser extends AVObject {
    * 
    * 本方法请在异步方法中调用
    * 
-   * @param mobilePhoneNumber
+   * @param mobilePhoneNumber 手机号码
+   * @throws AVException 请求异常
    */
 
   public static void requestMobilePhoneVerify(String mobilePhoneNumber) throws AVException {
@@ -1234,7 +1269,8 @@ public class AVUser extends AVObject {
    * 在发送这条请求前，请保证您已经成功保存用户的手机号码，并且在控制中心打开了“验证注册用户手机号码”选项
    * 
    * 
-   * @param mobilePhoneNumber
+   * @param mobilePhoneNumber 手机号码
+   * @param callback 请求成功以后会调用callback.done(e)
    */
   @Deprecated
   public static void requestMobilePhoneVerifyInBackgroud(String mobilePhoneNumber,
@@ -1248,7 +1284,8 @@ public class AVUser extends AVObject {
    * 在发送这条请求前，请保证您已经成功保存用户的手机号码，并且在控制中心打开了“验证注册用户手机号码”选项
    * 
    * 
-   * @param mobilePhoneNumber
+   * @param mobilePhoneNumber 手机号码
+   * @param callback 请求成功以后会调用callback.done(e)
    */
   public static void requestMobilePhoneVerifyInBackground(String mobilePhoneNumber,
       RequestMobileCodeCallback callback) {
@@ -1292,8 +1329,8 @@ public class AVUser extends AVObject {
    * 
    * 请在异步任务中调用本方法，或者请使用requestLoginSmsCodeInBackground
    * 
-   * @param mobilePhoneNumber
-   * @throws AVException
+   * @param mobilePhoneNumber 手机号码
+   * @throws AVException 请求异常
    */
   public static void requestLoginSmsCode(String mobilePhoneNumber) throws AVException {
     requestLoginSmsCodeInBackground(mobilePhoneNumber, true, new RequestMobileCodeCallback() {
@@ -1356,7 +1393,8 @@ public class AVUser extends AVObject {
    * 
    * 请在异步方法中调用此方法，或者您可以调用verifyMobilePhoneInBackground方法
    * 
-   * @param verifyCode
+   * @param verifyCode 验证码
+   * @throws AVException 请求异常
    */
   public static void verifyMobilePhone(String verifyCode) throws AVException {
     verifyMobilePhoneInBackground(true, verifyCode, new AVMobilePhoneVerifyCallback() {
@@ -1381,7 +1419,8 @@ public class AVUser extends AVObject {
    * 验证手机收到的验证码
    * 
    * 
-   * @param verifyCode
+   * @param verifyCode 验证码
+   * @param callback 请求成功以后会调用 callback.done(e)
    */
   @Deprecated
   public static void verifyMobilePhoneInBackgroud(String verifyCode,
@@ -1393,7 +1432,8 @@ public class AVUser extends AVObject {
    * 验证手机收到的验证码
    * 
    * 
-   * @param verifyCode
+   * @param verifyCode 验证码
+   * @param callback 请求成功以后会调用 callback.done(e)
    */
   public static void verifyMobilePhoneInBackground(String verifyCode,
       AVMobilePhoneVerifyCallback callback) {
@@ -1521,6 +1561,8 @@ public class AVUser extends AVObject {
    * Typically, you should use AVUser.signUpInBackground(com.parse.SignUpCallback) instead of this,
    * unless you are managing your own threading.
    * </p>
+   * 
+   * @throws AVException 注册请求异常
    */
   public void signUp() throws AVException {
     signUp(true, new SignUpCallback() {
@@ -1805,7 +1847,8 @@ public class AVUser extends AVObject {
    * 
    * @param userObjectId 待查询的用户objectId。
    * @param clazz AVUser类或者其子类。
-   * 
+   * @param <T> subclass of AVUser
+   * @return follower查询对象
    * @since 2.3.0
    */
   static public <T extends AVUser> AVQuery<T> followerQuery(final String userObjectId,
@@ -1827,7 +1870,10 @@ public class AVUser extends AVObject {
    * </p>
    * 
    * @param clazz AVUser类或者其子类。
+   * @param <T> subclass of AVUser
+   * @return follower查询对象
    * @since 2.3.0
+   * @throws AVException 如果当前对象未保存过则会报错
    */
   public <T extends AVUser> AVQuery<T> followerQuery(Class<T> clazz) throws AVException {
     if (AVUtils.isBlankString(this.getObjectId())) {
@@ -1845,7 +1891,8 @@ public class AVUser extends AVObject {
    * 
    * @param userObjectId 待查询的用户objectId。
    * @param clazz AVUser类或者其子类。
-   * 
+   * @param <T> subclass of AVUser
+   * @return followee查询
    * @since 2.3.0
    */
   static public <T extends AVUser> AVQuery<T> followeeQuery(final String userObjectId,
@@ -1867,6 +1914,9 @@ public class AVUser extends AVObject {
    * </p>
    * 
    * @param clazz AVUser类或者其子类。
+   * @return followee 查询
+   * @param <T> AVUser的子类
+   * @throws AVException 如果本对象从来没有保存过会遇到错误
    * 
    * @since 2.3.0
    */
@@ -1880,7 +1930,7 @@ public class AVUser extends AVObject {
   /**
    * 获取用户好友关系的查询条件，同时包括用户的关注和用户粉丝
    * 
-   * @return
+   * @return 好友查询
    */
   public AVFriendshipQuery friendshipQuery() {
     return this.friendshipQuery(subClazz == null ? AVUser.class : subClazz);
@@ -1890,8 +1940,8 @@ public class AVUser extends AVObject {
    * 获取用户好友关系的查询条件，同时包括用户的关注和用户粉丝
    * 
    * @param clazz 最终返回的AVUser的子类
-   * @param <T>
-   * @return
+   * @param <T> AVUser的子类
+   * @return 好友查询
    */
   public <T extends AVUser> AVFriendshipQuery friendshipQuery(Class<T> clazz) {
     return new AVFriendshipQuery(this.objectId, clazz);
@@ -1901,8 +1951,8 @@ public class AVUser extends AVObject {
    * 获取用户好友关系的查询条件，同时包括用户的关注和用户粉丝
    * 
    * @param userId AVUser的objectId
-   * @param <T>
-   * @return
+   * @param <T> AVUser的子类
+   * @return 好友查询
    */
   public static <T extends AVUser> AVFriendshipQuery friendshipQuery(String userId) {
     return new AVFriendshipQuery(userId, subClazz == null ? AVUser.class : subClazz);
@@ -1913,8 +1963,8 @@ public class AVUser extends AVObject {
    * 
    * @param userId AVUser的objectId
    * @param clazz 指定的AVUser或者其子类
-   * @param <T>
-   * @return
+   * @param <T> AVUser的子类
+   * @return 好友查询
    */
   public static <T extends AVUser> AVFriendshipQuery friendshipQuery(String userId, Class<T> clazz) {
     return new AVFriendshipQuery(userId, clazz);
@@ -2016,6 +2066,8 @@ public class AVUser extends AVObject {
   /**
    * 
    * 通过设置此方法，所有关联对象中的AVUser对象都会被强转成注册的AVUser子类对象
+   * 
+   * @param clazz AVUser的子类
    */
 
   public static void alwaysUseSubUserClass(Class<? extends AVUser> clazz) {
@@ -2053,6 +2105,7 @@ public class AVUser extends AVObject {
    * @param clazz 子类化的AVUer的class对象
    * @param userInfo 在SNS登录成功后，返回的userInfo信息。
    * @param callback 关联完成后，调用的回调函数。
+   * @param <T> AVUser子类
    * @since 1.4.4
    */
   static public <T extends AVUser> void loginWithAuthData(final Class<T> clazz,

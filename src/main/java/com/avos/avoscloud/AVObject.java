@@ -140,7 +140,7 @@ public class AVObject implements Parcelable {
   /**
    * 将本对象转化为一个jsonObject
    *
-   * @return
+   * @return jsonObject
    */
   public JSONObject toJSONObject() {
     Map<String, Object> dataMap = new HashMap<String, Object>();
@@ -203,10 +203,8 @@ public class AVObject implements Parcelable {
     return newMap;
   }
 
-  /**
+  /*
    * internal method for fastjson getter/setter
-   *
-   * @return
    */
 
   Map<String, Object> getServerData() {
@@ -222,37 +220,29 @@ public class AVObject implements Parcelable {
     this.serverData = serverData;
   }
 
-  /**
+  /*
    * internal method for fastjson getter/setter
-   *
-   * @return
    */
   Map<String, AVOp> getOperationQueue() {
     return operationQueue;
   }
 
-  /**
+  /*
    * internal method for fastjson getter/setter
-   *
-   * @param operationQueue
    */
   void setOperationQueue(HashMap<String, AVOp> operationQueue) {
     this.operationQueue = operationQueue;
   }
 
-  /**
+  /*
    * Internal usage.You SHOULD NOT invoke this method.
-   *
-   * @return
    */
   boolean isDataReady() {
     return isDataReady;
   }
 
-  /**
+  /*
    * Internal usesage.You SHOULD NOT invoke this method.
-   *
-   * @return
    */
   void setDataReady(boolean isDataReady) {
     this.isDataReady = isDataReady;
@@ -267,19 +257,15 @@ public class AVObject implements Parcelable {
     this.updatedAt = updatedAt;
   }
 
-  /**
+  /*
    * Internal usesage.You SHOULD NOT invoke this method.
-   *
-   * @return
    */
   void setCreatedAt(String createdAt) {
     this.createdAt = createdAt;
   }
 
-  /**
+  /*
    * Internal usesage.You SHOULD NOT invoke this method.
-   *
-   * @return
    */
   void setUuid(String uuid) {
     this.uuid = uuid;
@@ -327,6 +313,7 @@ public class AVObject implements Parcelable {
    * Register subclass to AVOSCloud SDK.It must be invocated before AVOSCloud.initialize.
    *
    * @param clazz The subclass.
+   * @param <T> AVObject subclass
    * @since 1.3.6
    */
   public static <T extends AVObject> void registerSubclass(Class<T> clazz) {
@@ -395,6 +382,7 @@ public class AVObject implements Parcelable {
    * Create a AVQuery with special sub-class.
    *
    * @param clazz The AVObject subclass
+   * @param <T> AVObject subclass
    * @return The AVQuery
    */
   public static <T extends AVObject> AVQuery<T> getQuery(Class<T> clazz) {
@@ -450,9 +438,10 @@ public class AVObject implements Parcelable {
   /**
    * 通过解析AVObject.toString得到的String对象来获取AVObject对象
    *
-   * @param avObjectString
-   * @return
-   * @throws Exception
+   * @param avObjectString string got from AVObject.toString
+   * @return parsed AVObject
+   * @throws Exception exception during AVObject parse497
+   * 
    */
   public static AVObject parseAVObject(String avObjectString) throws Exception {
     AVObject object = (AVObject) JSON.parse(avObjectString);
@@ -492,7 +481,9 @@ public class AVObject implements Parcelable {
    *
    * @param clazz The object's class.
    * @param objectId The object id for the referenced object.
+   * @param <T> AVObject subclass
    * @return A AVObject without data.
+   * @throws AVException exception if clazz instance creation failure
    */
   public static <T extends AVObject> T createWithoutData(Class<T> clazz, String objectId)
       throws AVException {
@@ -520,8 +511,8 @@ public class AVObject implements Parcelable {
    * Deletes this object on the server. This does not delete or destroy the object locally.
    *
    * @param option options for server to
-   * @throws Exception AVException Throws an error if the object does not exist or if the internet
-   *         fails.
+   * 
+   * @throws AVException Throws an error if the object does not exist or if the internet fails.
    */
   public void delete(AVDeleteOption option) throws AVException {
     delete(true, false, option, new DeleteCallback() {
@@ -547,7 +538,7 @@ public class AVObject implements Parcelable {
    * Delete AVObject in batch.The objects class name must be the same.
    *
    * @param objects the AVObject list to be deleted.
-   * @throws AVException
+   * @throws AVException Throws an error if any object does not exist or if the internet fails.
    * @since 1.4.0
    */
   public static void deleteAll(Collection<? extends AVObject> objects) throws AVException {
@@ -572,9 +563,8 @@ public class AVObject implements Parcelable {
   /**
    * Delete AVObject in batch with callback in background.The objects class name must be the same.
    *
-   * @param objects
-   * @param deleteCallback
-   * @throws AVException
+   * @param objects objects the AVObject list to be deleted.
+   * @param deleteCallback deleteCallback.done will be called when api done
    * @since 1.4.0
    */
   public static void deleteAllInBackground(Collection<? extends AVObject> objects,
@@ -681,20 +671,19 @@ public class AVObject implements Parcelable {
 
   /**
    * Deletes this object on the server in a background thread. Does nothing in particular when the
-   * save completes. Use this when you don't care if the delete works.
+   * delete completes. Use this when you don't care if the delete works.
    *
-   * @param option
+   * @param option option or conditions for delete operation
    */
   public void deleteInBackground(AVDeleteOption option) {
     deleteInBackground(option, null);
   }
 
   /**
-   * Deletes this object on the server in a background thread. Does nothing in particular when the
-   * save completes. Use this when you don't care if the delete works.
+   * Deletes this object on the server in a background thread.
    *
-   * @param option
-   * @param callback
+   * @param option option or conditions for delete operation
+   * @param callback callback.done will be called when the delete completes
    */
   public void deleteInBackground(AVDeleteOption option, DeleteCallback callback) {
     delete(false, false, option, callback);
@@ -704,7 +693,7 @@ public class AVObject implements Parcelable {
    * Deletes this object on the server in a background thread. This is preferable to using delete(),
    * unless your code is already running from a background thread.
    *
-   * @param callback callback.done(e) is called when the save completes.
+   * @param callback callback.done(e) is called when the delete completes.
    */
   public void deleteInBackground(DeleteCallback callback) {
     delete(false, false, null, callback);
@@ -791,6 +780,7 @@ public class AVObject implements Parcelable {
    * Fetches all the objects that don't have data in the provided list.
    *
    * @param objects The list of objects to fetch.
+   * @return The list of objects fetched
    * @throws AVException Throws an exception if the server returns an error or is inaccessible.
    */
   public static List<AVObject> fetchAllIfNeeded(List<AVObject> objects) throws AVException {
@@ -990,6 +980,8 @@ public class AVObject implements Parcelable {
 
   /**
    * Access the AVACL governing this object.
+   * 
+   * @return AVACL of AVObject
    */
   public AVACL getACL() {
     return acl;
@@ -1018,6 +1010,8 @@ public class AVObject implements Parcelable {
 
   /**
    * Accessor to the class name.
+   * 
+   * @return object class name
    */
   public String getClassName() {
     if (AVUtils.isBlankString(className)) {
@@ -1133,9 +1127,10 @@ public class AVObject implements Parcelable {
   /**
    * 获得一个指定类型的List值
    *
-   * @param key
-   * @param clazz
-   * @return
+   * @param key The key to access the value for
+   * @param clazz specified class type for return list
+   * @param <T> AVObject subclass
+   * @return Returns null if there is no such key or if the value can't be converted to a List.
    */
 
   public <T extends AVObject> List<T> getList(String key, Class<T> clazz) {
@@ -1172,6 +1167,7 @@ public class AVObject implements Parcelable {
    * Access a Map value
    *
    * @param key The key to access the value for
+   * @param <V> generic type for map value
    * @return Returns null if there is no such key or if the value can't be converted to a Map.
    */
   public <V> Map<String, V> getMap(String key) {
@@ -1205,6 +1201,7 @@ public class AVObject implements Parcelable {
    * been downloaded (e.g. by calling AVFile.getData()), AVFile.isDataAvailable() will return false.
    *
    * @param key The key to access the value for.
+   * @param <T> AVFile subclass
    * @return Returns null if there is no such key or if it is not a AVFile.
    */
   @SuppressWarnings("unchecked")
@@ -1228,6 +1225,7 @@ public class AVObject implements Parcelable {
    * or AVObject.refresh()), AVObject.isDataAvailable() will return false.
    *
    * @param key The key to access the value for.
+   * @param <T> AVObject subclass
    * @return Returns null if there is no such key or if it is not a AVObject.
    */
   @SuppressWarnings("unchecked")
@@ -1255,6 +1253,7 @@ public class AVObject implements Parcelable {
    * or AVObject.refresh()), AVObject.isDataAvailable() will return false.
    *
    * @param key The key to access the value for.
+   * @param <T> AVObject subclass
    * @return Returns null if there is no such key or if it is not a AVUser.
    */
   @SuppressWarnings("unchecked")
@@ -1269,6 +1268,7 @@ public class AVObject implements Parcelable {
    *
    * @param key The key to access the value for.
    * @param clazz subclass of AVUser as the class of return value
+   * @param <T> subclass of AVObject
    * @return Returns null if there is no such key or if it is not a AVUser.
    */
   public <T extends AVUser> T getAVUser(String key, Class<T> clazz) {
@@ -1280,6 +1280,7 @@ public class AVObject implements Parcelable {
    * Access or create a Relation value for a key
    *
    * @param key The key to access the relation for.
+   * @param <T>subclass of AVObject
    * @return the AVRelation object if the relation already exists for the key or can be created for
    *         this key.
    */
@@ -1333,8 +1334,6 @@ public class AVObject implements Parcelable {
     return (this.get(key) != null);
   }
 
-  /**
-   */
   public boolean hasSameId(AVObject other) {
     return other.objectId.equals(this.objectId);
   }
@@ -1417,6 +1416,8 @@ public class AVObject implements Parcelable {
   /**
    * Returns a set view of the keys contained in this object. This does not include createdAt,
    * updatedAt, authData, or objectId. It does include things like username and ACL.
+   * 
+   * @return keyset of AVObject attributes
    */
   public Set<String> keySet() {
     return instanceData.keySet();
@@ -1580,7 +1581,7 @@ public class AVObject implements Parcelable {
    * AVObject.saveInBackground(com.parse.SaveCallback) instead of this, unless you are managing your
    * own threading.
    *
-   * @throws AVException
+   * @throws AVException exception during save operation
    */
   public void save() throws AVException {
     saveObject(true, false, new SaveCallback() {
@@ -1605,6 +1606,7 @@ public class AVObject implements Parcelable {
    * Saves this object to the server.
    *
    * @param option save options
+   * @throws AVException exception during save operation
    */
   public void save(AVSaveOption option) throws AVException {
     saveObject(option, true, false, new SaveCallback() {
@@ -1758,9 +1760,10 @@ public class AVObject implements Parcelable {
   }
 
   /**
+   * <p>
    * 适用于用户并不关心具体保存到服务器的具体时间，或者数据并不需要时常与服务器发生交互时，可以使用本方法 在网络请求遇到异常时，AVOS
    * Cloud会将此类请求保存到本地，等到网络回复正常或者排除故障以后再发送请求 被保存下来的请求会按照初始的发送顺序进行发送
-   * <p/>
+   * </p>
    * 由于保存的时间无法确定，回调发生时可能已经超出了原来的运行环境，即便发生也没有意义，所以不鼓励用户saveEventually中传入callback
    *
    * @param callback A callback which will be called if the save completes before the app exits.
@@ -2283,7 +2286,7 @@ public class AVObject implements Parcelable {
    * Saves this object to the server in a background thread.
    *
    * @param option save options
-   * @param callback
+   * @param callback callback.done(e) is called when the save completes.
    */
 
   public void saveInBackground(AVSaveOption option, SaveCallback callback) {
@@ -2297,7 +2300,7 @@ public class AVObject implements Parcelable {
   /**
    * Set the AVACL governing this object
    *
-   * @param acl
+   * @param acl access control level
    */
   public void setACL(AVACL acl) {
     this.acl = acl;
@@ -2307,6 +2310,8 @@ public class AVObject implements Parcelable {
    * Setter for the object id. In general you do not need to use this. However, in some cases this
    * can be convenient. For example, if you are serializing a AVObject yourself and wish to recreate
    * it, you can use this to recreate the AVObject exactly.
+   * 
+   * @param newObjectId id for AVObject
    */
   public void setObjectId(String newObjectId) {
     objectId = newObjectId;

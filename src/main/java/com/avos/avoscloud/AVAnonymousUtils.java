@@ -61,7 +61,9 @@ public class AVAnonymousUtils {
    * Creates an anonymous user.
    * 
    * This is a synchronized method
-   * 
+   *
+   * @return anonymous user
+   * @throws AVException login exception
    */
   public static AVUser logIn() throws AVException {
     logIn(new LogInCallback<AVUser>() {

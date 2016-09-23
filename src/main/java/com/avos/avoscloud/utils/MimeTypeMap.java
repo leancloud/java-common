@@ -19,7 +19,7 @@ public class MimeTypeMap {
    * convenience method for obtaining the extension of a url and has undefined results for other
    * Strings.
    * 
-   * @param url
+   * @param url file url
    * @return The file extension of the given url.
    */
   public static String getFileExtensionFromUrl(String url) {

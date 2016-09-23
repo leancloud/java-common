@@ -9,7 +9,7 @@ public interface InternalRequestSign {
   /**
    * compute restful api request sign
    * 
-   * @return
+   * @return request sign
    */
   public String requestSign();
 }

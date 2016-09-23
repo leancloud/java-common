@@ -1,11 +1,11 @@
 package com.avos.avoscloud;
 
-import com.alibaba.fastjson.JSON;
-import com.avos.avoscloud.callback.AVFriendshipCallback;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import com.alibaba.fastjson.JSON;
+import com.avos.avoscloud.callback.AVFriendshipCallback;
 
 /**
  * 用于查询用户的好友关系的Query对象，同时包含用户的粉丝和用户的关注
@@ -114,7 +114,7 @@ public class AVFriendshipQuery<T extends AVUser> {
 
   /**
    * 
-   * @param callback
+   * @param callback callback.done will be called when done
    */
   public void getInBackground(AVFriendshipCallback callback) {
     this.getInBackground(this.userId, false, callback);
@@ -122,6 +122,8 @@ public class AVFriendshipQuery<T extends AVUser> {
 
   /**
    * Accessor for the limit.
+   * 
+   * @return limit for query result count
    */
   public int getLimit() {
     return conditions.getLimit();
@@ -132,6 +134,7 @@ public class AVFriendshipQuery<T extends AVUser> {
    * retrieval without a limit. The default limit is 100, with a maximum of 1000 results being
    * returned at a time.
    *
+   * @param limit limit for query result count
    * @return this query.
    */
   public AVFriendshipQuery<T> setLimit(int limit) {
@@ -141,7 +144,7 @@ public class AVFriendshipQuery<T extends AVUser> {
 
   /**
    * @see #setLimit(int)
-   * @param limit
+   * @param limit limit for query result count
    * @return this query.
    */
   public AVFriendshipQuery<T> limit(int limit) {
@@ -151,7 +154,7 @@ public class AVFriendshipQuery<T extends AVUser> {
 
   /**
    * @see #setSkip(int)
-   * @param skip
+   * @param skip count to skip in query result
    * @return this query.
    */
   public AVFriendshipQuery<T> skip(int skip) {
@@ -161,6 +164,8 @@ public class AVFriendshipQuery<T extends AVUser> {
 
   /**
    * Accessor for the skip value.
+   * 
+   * @return count to skip in query result
    */
   public int getSkip() {
     return conditions.getSkip();
@@ -170,6 +175,7 @@ public class AVFriendshipQuery<T extends AVUser> {
    * Controls the number of results to skip before returning any results. This is useful for
    * pagination. Default is to skip zero results.
    *
+   * @param skip count to skip in query result
    * @return this query
    */
   public AVFriendshipQuery<T> setSkip(int skip) {
@@ -184,7 +190,7 @@ public class AVFriendshipQuery<T extends AVUser> {
   /**
    * Set query order fields.
    *
-   * @param order
+   * @param order order for query result
    * @return this query.
    */
   public AVFriendshipQuery<T> setOrder(String order) {
@@ -194,8 +200,8 @@ public class AVFriendshipQuery<T extends AVUser> {
 
   /**
    * @see #setOrder(String)
-   * @param order
-   * @return
+   * @param order order for query result
+   * @return this query.
    */
   public AVFriendshipQuery<T> order(String order) {
     setOrder(order);
@@ -231,6 +237,7 @@ public class AVFriendshipQuery<T extends AVUser> {
    * in the included object that are also fetched.
    *
    * @param key The key that should be included.
+   * @return this query
    */
   public AVFriendshipQuery<T> include(String key) {
     conditions.include(key);
@@ -242,6 +249,7 @@ public class AVFriendshipQuery<T extends AVUser> {
    * multiple times, then all of the keys specified in each of the calls will be included.
    *
    * @param keys The set of keys to include in the result.
+   * @return this query
    */
   public AVFriendshipQuery<T> selectKeys(Collection<String> keys) {
     conditions.selectKeys(keys);
@@ -302,7 +310,7 @@ public class AVFriendshipQuery<T extends AVUser> {
    * @since 2.0.2
    * @param key 查询的key
    * @param size 数组的长度
-   * @return
+   * @return this query
    */
   public AVFriendshipQuery<T> whereSizeEqual(String key, int size) {
     conditions.whereSizeEqual(key, size);
@@ -328,6 +336,7 @@ public class AVFriendshipQuery<T extends AVUser> {
    * Add a constraint for finding objects that do not contain a given key.
    *
    * @param key The key that should not exist
+   * @return Returns the query, so you can chain this call.
    */
   public AVFriendshipQuery<T> whereDoesNotExist(String key) {
     conditions.whereDoesNotExist(key);
@@ -386,6 +395,7 @@ public class AVFriendshipQuery<T extends AVUser> {
    * Add a constraint for finding objects that contain the given key.
    *
    * @param key The key that should exist.
+   * @return Returns the query, so you can chain this call.
    */
   public AVFriendshipQuery<T> whereExists(String key) {
     conditions.whereExists(key);
@@ -465,7 +475,7 @@ public class AVFriendshipQuery<T extends AVUser> {
    * @param regex The regular expression pattern to match.
    * @param modifiers Any of the following supported PCRE modifiers: i - Case insensitive search m -
    *        Search across multiple lines of input
-   * @return
+   * @return Returns the query, so you can chain this call.
    */
   public AVFriendshipQuery<T> whereMatches(String key, String regex, String modifiers) {
     conditions.whereMatches(key, regex, modifiers);
@@ -546,7 +556,7 @@ public class AVFriendshipQuery<T extends AVUser> {
    * @param key The key that the AVGeoPoint is stored in.
    * @param point The reference AVGeoPoint that is used.
    * @param maxDistance Maximum distance (in kilometers) of results to return.
-   * @return
+   * @return Returns the query, so you can chain this call.
    */
   public AVFriendshipQuery<T> whereWithinKilometers(String key, AVGeoPoint point, double maxDistance) {
     conditions.whereWithinKilometers(key, point, maxDistance);
@@ -556,6 +566,11 @@ public class AVFriendshipQuery<T extends AVUser> {
   /**
    * Add a proximity based constraint for finding objects with key point values near the point given
    * and within the maximum distance given. Radius of earth used is 3958.8 miles.
+   * 
+   * @param key The key that the AVGeoPoint is stored in.
+   * @param point point The reference AVGeoPoint that is used.
+   * @param maxDistance maxDistance Maximum distance (in miles) of results to return.
+   * @return Returns the query, so you can chain this call.
    */
   public AVFriendshipQuery<T> whereWithinMiles(String key, AVGeoPoint point, double maxDistance) {
     conditions.whereWithinMiles(key, point, maxDistance);

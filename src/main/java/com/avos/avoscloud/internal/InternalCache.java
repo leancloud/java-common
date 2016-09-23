@@ -10,10 +10,10 @@ public interface InternalCache {
   /**
    * 是否有有效的 cache，本地有相应缓存并且没有超过缓存限制及认为有效
    *
-   * @param key
-   * @param ts
-   * @param maxAgeInMilliseconds
-   * @return
+   * @param key 缓存的key
+   * @param ts 当前时间
+   * @param maxAgeInMilliseconds 最大缓存有效时间
+   * @return 是否有有效缓存
    */
   public boolean hasValidCache(String key, String ts, long maxAgeInMilliseconds);
 
