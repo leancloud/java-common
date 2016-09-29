@@ -8,6 +8,7 @@
   <packaging>jar</packaging>
 
   <name>leancloud-common</name>
+  <description>leancloud java sdk common library</description>
   <url>http://github.com/leancloud/java-common</url>
 
   <licenses>
