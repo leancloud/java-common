@@ -741,34 +741,75 @@ public class AVUtils {
 
   public static Object getParsedObject(Object object, boolean topObject, boolean instanceValue,
       boolean withDate) {
-    if (object == null) {
-      return null;
-    } else if (object instanceof Map) {
-      return getParsedMap((Map<String, Object>) object, topObject, instanceValue, withDate);
-    } else if (object instanceof Collection) {
-      return getParsedList((Collection) object, topObject, instanceValue, withDate);
-    } else if (object instanceof AVObject) {
-      if (!topObject) {
-        return mapFromPointerObject((AVObject) object);
-      } else if (!instanceValue) {
-        return mapFromAVObject((AVObject) object, true, false, withDate);
+    return getParsedObject(object, topObject, instanceValue, withDate, false);
+  }
+
+  public static Object getParsedObject(Object object, boolean topObject, boolean instanceValue,
+      boolean withDate, boolean withACL) {
+    return new ObjectParser().asTopObject(topObject).withInstanceValue(instanceValue)
+        .withDate(withDate).withACL(withACL).parse(object);
+  }
+
+  public static class ObjectParser {
+    boolean topObject;
+    boolean instanceValue;
+    boolean withDate;
+    boolean withACL;
+
+    public ObjectParser asTopObject(boolean topObject) {
+      this.topObject = topObject;
+      return this;
+    }
+
+    public ObjectParser withInstanceValue(boolean withInstanceValue) {
+      this.instanceValue = withInstanceValue;
+      return this;
+    }
+
+    public ObjectParser withDate(boolean withDate) {
+      this.withDate = withDate;
+      return this;
+    }
+
+    public ObjectParser withACL(boolean withACL) {
+      this.withACL = withACL;
+      return this;
+    }
+
+    public Object parse(Object object) {
+      if (object == null) {
+        return null;
+      } else if (object instanceof Map) {
+        return getParsedMap((Map<String, Object>) object, topObject, instanceValue, withDate);
+      } else if (object instanceof Collection) {
+        return getParsedList((Collection) object, topObject, instanceValue, withDate);
+      } else if (object instanceof AVObject) {
+        if (!topObject) {
+          return mapFromPointerObject((AVObject) object);
+        } else if (!instanceValue) {
+          return mapFromAVObject((AVObject) object, true, false, withDate);
+        } else {
+          Map<String, Object> map = mapFromAVObject((AVObject) object, true, true);
+          if (withACL && ((AVObject) object).acl != null) {
+            map.putAll(AVUtils.getParsedMap(((AVObject) object).acl.getACLMap()));
+          }
+          return map;
+        }
+      } else if (object instanceof AVGeoPoint) {
+        return mapFromGeoPoint((AVGeoPoint) object);
+      } else if (object instanceof Date) {
+        return mapFromDate((Date) object);
+      } else if (object instanceof byte[]) {
+        return mapFromByteArray((byte[]) object);
+      } else if (object instanceof AVFile) {
+        return mapFromFile((AVFile) object);
+      } else if (object instanceof org.json.JSONObject) {
+        return JSON.parse(object.toString());
+      } else if (object instanceof org.json.JSONArray) {
+        return JSON.parse(object.toString());
       } else {
-        return mapFromAVObject((AVObject) object, true, true);
+        return object;
       }
-    } else if (object instanceof AVGeoPoint) {
-      return mapFromGeoPoint((AVGeoPoint) object);
-    } else if (object instanceof Date) {
-      return mapFromDate((Date) object);
-    } else if (object instanceof byte[]) {
-      return mapFromByteArray((byte[]) object);
-    } else if (object instanceof AVFile) {
-      return mapFromFile((AVFile) object);
-    } else if (object instanceof org.json.JSONObject) {
-      return JSON.parse(object.toString());
-    } else if (object instanceof org.json.JSONArray) {
-      return JSON.parse(object.toString());
-    } else {
-      return object;
     }
   }
 

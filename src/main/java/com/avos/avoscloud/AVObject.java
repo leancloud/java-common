@@ -323,6 +323,9 @@ public class AVObject implements Parcelable {
     }
     String className = parseClassName.value();
     AVUtils.checkClassName(className);
+    ParserConfig.getGlobalInstance().putDeserializer(clazz, AVObjectDeserializer.instance);
+    SerializeConfig.getGlobalInstance().put(clazz, AVObjectSerializer.instance);
+
     SUB_CLASSES_MAP.put(className, clazz);
     SUB_CLASSES_REVERSE_MAP.put(clazz, className);
   }
