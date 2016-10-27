@@ -741,6 +741,11 @@ public class AVUtils {
 
   public static Object getParsedObject(Object object, boolean topObject, boolean instanceValue,
       boolean withDate) {
+    return getParsedObject(object, topObject, instanceValue, withDate, false);
+  }
+
+  public static Object getParsedObject(Object object, boolean topObject, boolean instanceValue,
+      boolean withDate, boolean withACL) {
     if (object == null) {
       return null;
     } else if (object instanceof Map) {
@@ -753,7 +758,11 @@ public class AVUtils {
       } else if (!instanceValue) {
         return mapFromAVObject((AVObject) object, true, false, withDate);
       } else {
-        return mapFromAVObject((AVObject) object, true, true);
+        Map<String, Object> map = mapFromAVObject((AVObject) object, true, true);
+        if (withACL && ((AVObject) object).acl != null) {
+          map.putAll(AVUtils.getParsedMap(((AVObject) object).acl.getACLMap()));
+        }
+        return map;
       }
     } else if (object instanceof AVGeoPoint) {
       return mapFromGeoPoint((AVGeoPoint) object);
