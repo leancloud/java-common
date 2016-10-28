@@ -4,7 +4,7 @@
 
   <groupId>cn.leancloud</groupId>
   <artifactId>leancloud-common</artifactId>
-  <version>0.1.7</version>
+  <version>0.1.8-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>leancloud-common</name>
@@ -102,6 +102,7 @@
         <version>2.10.4</version>
 	<configuration>
 	  <failOnError>false</failOnError>
+	  <additionalparam>-Xdoclint:none</additionalparam>
         </configuration>
         <executions>
           <execution>
@@ -156,7 +157,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <source>1.7</source>
-          <target>1.7</target>
+	  <target>1.7</target>
+	  <encoding>${project.build.sourceEncoding}</encoding>
         </configuration>
       </plugin>
       <plugin>
