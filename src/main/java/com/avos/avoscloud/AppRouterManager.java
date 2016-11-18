@@ -204,13 +204,10 @@ public class AppRouterManager {
             .globalInstance()
             .getInternalPersistence()
             .getPersistentSettingString(routerSharePreferenceName, PUSH_ROUTER_SERVER_KEY,
-                getAPIServer());
-    apiServer =
-        InternalConfigurationController
-            .globalInstance()
-            .getInternalPersistence()
-            .getPersistentSettingString(routerSharePreferenceName, API_SERVER_KEY,
                 getRouterServer());
+    apiServer =
+        InternalConfigurationController.globalInstance().getInternalPersistence()
+            .getPersistentSettingString(routerSharePreferenceName, API_SERVER_KEY, getAPIServer());
     PaasClient.updateAPIServer(apiServer);
   }
 
