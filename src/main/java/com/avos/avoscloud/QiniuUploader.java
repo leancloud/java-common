@@ -28,7 +28,7 @@ class QiniuUploader extends HttpClientUploader {
   private int blockCount;
   private String fileKey;
 
-  private static final String QINIU_HOST = "http://upload.qiniu.com";
+  private static final String QINIU_HOST = "https://up.qbox.me";
   private static final String QINIU_CREATE_BLOCK_EP = QINIU_HOST + "/mkblk/%d";
   private static final String QINIU_BRICK_UPLOAD_EP = QINIU_HOST + "/bput/%s/%d";
   private static final String QINIU_MKFILE_EP = QINIU_HOST + "/mkfile/%d/key/%s";
