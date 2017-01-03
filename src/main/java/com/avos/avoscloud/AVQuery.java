@@ -1386,7 +1386,7 @@ public class AVQuery<T extends AVObject> {
     this.assembleParameters();
     Map<String, String> parameters = getParameters();
     parameters.put("limit", Integer.toString(1));
-    parameters.put("order", "-updatedAt");
+
     final GetCallback<T> internalCallback = callback;
     PaasClient.storageInstance().getObject(queryPath(), new AVRequestParams(getParameters()), sync,
         null, new GenericObjectCallback() {
