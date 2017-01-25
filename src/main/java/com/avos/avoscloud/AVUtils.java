@@ -221,6 +221,9 @@ public class AVUtils {
   }
 
   public static String stringFromDate(Date date) {
+    if (null == date) {
+      return null;
+    }
     SimpleDateFormat df = new SimpleDateFormat(dateFormat);
     df.setTimeZone(TimeZone.getTimeZone("UTC"));
     String isoDate = df.format(date);
