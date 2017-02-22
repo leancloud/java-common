@@ -539,7 +539,16 @@ public class AVStatus extends AVObject {
       return Collections.emptyList();
     }
 
-    com.alibaba.fastjson.JSONObject results = JSON.parseObject(content);
+    com.alibaba.fastjson.JSONObject results = null;
+    try {
+      results = JSON.parseObject(content);
+    } catch (Exception e) {
+    }
+
+    if (null == results) {
+      return Collections.emptyList();
+    }
+
     com.alibaba.fastjson.JSONArray array = results.getJSONArray("results");
     List<AVStatus> result = new LinkedList<AVStatus>();
     for (Object item : array) {
@@ -551,8 +560,11 @@ public class AVStatus extends AVObject {
   }
 
   static void processStatus(final String content, final AVStatus status) {
-    com.alibaba.fastjson.JSONObject object = JSON.parseObject(content);
-    processStatusFromObject(object, status);
+    try {
+      com.alibaba.fastjson.JSONObject object = JSON.parseObject(content);
+      processStatusFromObject(object, status);
+    } catch (Exception e) {
+    }
   }
 
   // TODO, move to AVUtils later.
@@ -570,8 +582,11 @@ public class AVStatus extends AVObject {
 
     String sourceString = AVUtils.getJSONString(jsonObject, "source", "");
     if (!AVUtils.isBlankString(sourceString)) {
-      Map<String, Object> map = JSON.parseObject(sourceString);
-      status.source = AVUtils.parseObjectFromMap(map);
+      try {
+        Map<String, Object> map = JSON.parseObject(sourceString);
+        status.source = AVUtils.parseObjectFromMap(map);
+      } catch (Exception e) {
+      }
     }
 
     java.util.Set<java.util.Map.Entry<java.lang.String, java.lang.Object>> entries =
@@ -610,8 +625,12 @@ public class AVStatus extends AVObject {
   }
 
   static int processStatusCount(String content) {
-    com.alibaba.fastjson.JSONObject data = JSON.parseObject(content);
-    return data.getInteger(UNREAD_TAG);
+    try {
+      com.alibaba.fastjson.JSONObject data = JSON.parseObject(content);
+      return data.getInteger(UNREAD_TAG);
+    } catch (Exception e) {
+      return  0;
+    }
   }
 
   static void getStatusCountImpl(final String endPoint, Map<String, String> map,

@@ -145,7 +145,13 @@ public class AppRouterManager {
                   LogUtil.avlog.d(" fetchRouter :" + content);
                 }
 
-                com.alibaba.fastjson.JSONObject response = JSON.parseObject(content);
+                com.alibaba.fastjson.JSONObject response = null;
+                try {
+                  response = JSON.parseObject(content);
+                } catch (Exception exception) {
+                  LogUtil.log.e("get router error ", exception);
+                }
+
                 if (null != response) {
                   if (response.containsKey(PUSH_ROUTER_SERVER_KEY)
                       && response.containsKey(API_SERVER_KEY)) {
