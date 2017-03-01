@@ -160,7 +160,11 @@ public class AVUtils {
   }
 
   public static Map<String, Object> mapFromPointerObject(AVObject object) {
-    return mapFromAVObject(object, false);
+    return mapFromPointerObject(object, false);
+  }
+
+  public static Map<String, Object> mapFromPointerObject(AVObject object, boolean withPointerValue) {
+    return mapFromAVObject(object, false, false, false , withPointerValue);
   }
 
   public static Map<String, Object> mapFromUserObjectId(final String userObjectId) {
@@ -403,11 +407,11 @@ public class AVUtils {
 
   private static Map<String, Object> mapFromAVObject(AVObject object, boolean topObject,
       boolean instanceValue) {
-    return mapFromAVObject(object, topObject, instanceValue, false);
+    return mapFromAVObject(object, topObject, instanceValue, false, false);
   }
 
   private static Map<String, Object> mapFromAVObject(AVObject object, boolean topObject,
-      boolean instanceValue, boolean withDate) {
+      boolean instanceValue, boolean withDate, boolean withPointerValue) {
 
     Map<String, Object> result = new HashMap<String, Object>();
     result.put("className", object.internalClassName());
@@ -415,23 +419,22 @@ public class AVUtils {
     if (!isBlankString(object.getObjectId())) {
       result.put("objectId", object.getObjectId());
     }
-    if (!topObject) {
-      result.put("__type", "Pointer");
-    } else if (!instanceValue) {
-      result.put("__type", "Object");
+    result.put("__type", topObject ? "Object" : "Pointer");
 
-      Map<String, Object> serverData = getParsedMap(object.serverData, false);
-      if (serverData != null && !serverData.isEmpty()) {
-        result.putAll(serverData);
-      }
-    } else {
-      result.put("__type", "Object");
-
-      Map<String, Object> serverData = getParsedMap(object.instanceData, false);
+    if (withPointerValue || topObject) {
+      Map<String, Object> serverData = getParsedMap(object.serverData, false, false, false, withPointerValue);
       if (serverData != null && !serverData.isEmpty()) {
         result.putAll(serverData);
       }
     }
+
+    if (instanceValue) {
+      Map<String, Object> serverData = getParsedMap(object.instanceData, false, false, false, withPointerValue);
+      if (serverData != null && !serverData.isEmpty()) {
+        result.putAll(serverData);
+      }
+    }
+
     if (withDate) {
       if (object.getCreatedAt() != null) {
         result.put(AVObject.CREATED_AT, object.createdAt);
@@ -444,14 +447,14 @@ public class AVUtils {
   }
 
   private static List getParsedList(Collection object, boolean topObject, boolean instanceValue,
-      boolean withDate) {
+      boolean withDate, boolean withPointerValue) {
     if (!topObject) {
       return getParsedList(object);
     } else {
       List newList = new ArrayList(object.size());
 
       for (Object o : object) {
-        newList.add(getParsedObject(o, true, instanceValue, withDate));
+        newList.add(getParsedObject(o, true, instanceValue, withDate, false, withPointerValue));
       }
 
       return newList;
@@ -459,17 +462,22 @@ public class AVUtils {
   }
 
   private static List getParsedList(Collection object, boolean topObject) {
-    return getParsedList(object, topObject, false, false);
+    return getParsedList(object, topObject, false, false, false);
   }
 
   private static Map<String, Object> getParsedMap(Map<String, Object> object, boolean topObject,
       boolean instanceData, boolean withDate) {
+    return getParsedMap(object, topObject, instanceData, withDate, false);
+  }
+
+  private static Map<String, Object> getParsedMap(Map<String, Object> object, boolean topObject,
+                                                  boolean instanceData, boolean withDate, boolean withPointerValue) {
     Map newMap = new HashMap<String, Object>(object.size());
 
     for (Map.Entry<String, Object> entry : object.entrySet()) {
       final String key = entry.getKey();
       Object o = entry.getValue();
-      newMap.put(key, getParsedObject(o, topObject, instanceData, withDate));
+      newMap.put(key, getParsedObject(o, topObject, instanceData, withDate, false , withPointerValue));
     }
 
     return newMap;
@@ -746,8 +754,13 @@ public class AVUtils {
 
   public static Object getParsedObject(Object object, boolean topObject, boolean instanceValue,
       boolean withDate, boolean withACL) {
+    return getParsedObject(object, topObject, instanceValue, withDate, withACL, false);
+  }
+
+  public static Object getParsedObject(Object object, boolean topObject, boolean instanceValue,
+                                       boolean withDate, boolean withACL, boolean withPointerValue) {
     return new ObjectParser().asTopObject(topObject).withInstanceValue(instanceValue)
-        .withDate(withDate).withACL(withACL).parse(object);
+            .withDate(withDate).withACL(withACL).withPointerValue(withPointerValue).parse(object);
   }
 
   public static class ObjectParser {
@@ -755,6 +768,7 @@ public class AVUtils {
     boolean instanceValue;
     boolean withDate;
     boolean withACL;
+    boolean withPointerValue;
 
     public ObjectParser asTopObject(boolean topObject) {
       this.topObject = topObject;
@@ -776,20 +790,25 @@ public class AVUtils {
       return this;
     }
 
+    public ObjectParser withPointerValue(boolean withPointerValue) {
+      this.withPointerValue = withPointerValue;
+      return this;
+    }
+
     public Object parse(Object object) {
       if (object == null) {
         return null;
       } else if (object instanceof Map) {
-        return getParsedMap((Map<String, Object>) object, topObject, instanceValue, withDate);
+        return getParsedMap((Map<String, Object>) object, topObject, instanceValue, withDate, withPointerValue);
       } else if (object instanceof Collection) {
-        return getParsedList((Collection) object, topObject, instanceValue, withDate);
+        return getParsedList((Collection) object, topObject, instanceValue, withDate, withPointerValue);
       } else if (object instanceof AVObject) {
         if (!topObject) {
-          return mapFromPointerObject((AVObject) object);
+          return mapFromPointerObject((AVObject) object, withPointerValue);
         } else if (!instanceValue) {
-          return mapFromAVObject((AVObject) object, true, false, withDate);
+          return mapFromAVObject((AVObject) object, true, false, withDate, withPointerValue);
         } else {
-          Map<String, Object> map = mapFromAVObject((AVObject) object, true, true);
+          Map<String, Object> map = mapFromAVObject((AVObject) object, true, true, false, withPointerValue);
           if (withACL && ((AVObject) object).acl != null) {
             map.putAll(AVUtils.getParsedMap(((AVObject) object).acl.getACLMap()));
           }
