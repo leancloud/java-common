@@ -96,10 +96,13 @@ public class AVStatusQuery extends AVQuery<AVStatus> {
     // TODO Auto-generated method stub
     if (InboxStatusFindCallback.class.isAssignableFrom(callback.getClass())) {
       InboxStatusFindCallback statusCallback = (InboxStatusFindCallback) callback;
-      com.alibaba.fastjson.JSONObject results = JSON.parseObject(content);
       boolean v = false;
-      if (results.containsKey(END)) {
-        v = results.getBoolean(END);
+      try {
+        com.alibaba.fastjson.JSONObject results = JSON.parseObject(content);
+        if (results.containsKey(END)) {
+          v = results.getBoolean(END);
+        }
+      } catch (Exception e) {
       }
       statusCallback.setEnd(v);
     }
