@@ -29,10 +29,10 @@ public class DeleteOp extends BaseOp {
   public AVOp merge(AVOp other) {
     assertKeyEquals(other);
     switch (other.type()) {
-      case Set:
       case Compound:
         other.cast(CompoundOp.class).addFirst(this);
         return other;
+      case Set:
       case Add:
       case AddUnique:
       case AddRelation:
