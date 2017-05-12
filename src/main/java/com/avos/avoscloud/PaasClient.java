@@ -139,6 +139,7 @@ public class PaasClient {
         .getAppConfiguration().getApplicationId());
     builder.header("Accept", defaultContentType);
     builder.header("Content-Type", defaultContentType);
+    builder.header("Accept-Encoding", "gzip");
     builder.header("User-Agent", InternalConfigurationController.globalInstance()
         .getClientConfiguration().getUserAgent());
     builder.header("X-LC-Sign", InternalConfigurationController.globalInstance()
