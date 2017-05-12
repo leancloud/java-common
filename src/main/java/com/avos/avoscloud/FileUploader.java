@@ -1,12 +1,13 @@
 package com.avos.avoscloud;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import android.util.SparseArray;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * User: summer Date: 13-4-16 Time: AM10:43
@@ -58,9 +59,10 @@ class FileUploader extends HttpClientUploader {
     if (uploadException == null) {
       parseFile.handleUploadedResponse(objectId, objectId, url);
       publishProgress(PROGRESS_COMPLETE);
+      completeFileUpload(true);
       return null;
     } else {
-      destroyFileObject(objectId);
+      completeFileUpload(false);
       return uploadException;
     }
   }
@@ -133,20 +135,20 @@ class FileUploader extends HttpClientUploader {
   }
 
 
-  private void destroyFileObject(String objectId) {
-    if (!AVUtils.isBlankString(objectId)) {
+  private void completeFileUpload(boolean success) {
+    if (!AVUtils.isBlankString(token)) {
       try {
-        AVObject fileObject = AVObject.createWithoutData("_File", objectId);
-        fileObject.deleteInBackground(new DeleteCallback() {
-
-          @Override
-          public void done(AVException e) {}
-        });
+        JSONObject completeResult = new JSONObject();
+        completeResult.put("result", success);
+        completeResult.put("token", this.token);
+        PaasClient.storageInstance().postObject("fileCallback", completeResult.toJSONString(),
+            false, new GenericObjectCallback() {});
       } catch (Exception e) {
         // ignore
       }
     }
   }
+
 
   protected static class ProgressCalculator {
     SparseArray<Integer> blockProgress = new SparseArray<Integer>();
