@@ -242,14 +242,20 @@ public class AVUtils {
   public static Map<String, Object> mapFromGeoPoint(AVGeoPoint point) {
     Map<String, Object> result = new HashMap<String, Object>();
     result.put(typeTag, "GeoPoint");
-    result.put("latitude", point.getLatitude());
-    result.put("longitude", point.getLongitude());
+    result.put(AVGeoPoint.LATITUDE_KEY, point.getLatitude());
+    result.put(AVGeoPoint.LONGTITUDE_KEY, point.getLongitude());
     return result;
   }
 
   public static AVGeoPoint geoPointFromMap(Map<String, Object> map) {
-    double la = ((Number) map.get("latitude")).doubleValue();
-    double lo = ((Number) map.get("longitude")).doubleValue();
+    double la = 0.0;
+    double lo = 0.0;
+    if (map.containsKey(AVGeoPoint.LATITUDE_KEY) && null != map.get(AVGeoPoint.LATITUDE_KEY)) {
+      la = ((Number)map.get(AVGeoPoint.LATITUDE_KEY)).doubleValue();
+    }
+    if (map.containsKey(AVGeoPoint.LONGTITUDE_KEY) && null != map.get(AVGeoPoint.LONGTITUDE_KEY)) {
+      lo = ((Number)map.get(AVGeoPoint.LONGTITUDE_KEY)).doubleValue();
+    }
     AVGeoPoint point = new AVGeoPoint(la, lo);
     return point;
   }
