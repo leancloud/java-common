@@ -66,6 +66,9 @@ class QCloudUploader extends HttpClientUploader {
       // 如果文件太小就没必要分片了
       if (sliceCount > 1) {
         JSONObject result = uploadControlSlice(token, uploadUrl, bytes);
+        if (null == result) {
+          return new AVException(new RuntimeException("Exception during file upload"));
+        }
         if (result.containsKey(PARAM_ACCESS_URL)) {
           return null;
         }
@@ -161,9 +164,15 @@ class QCloudUploader extends HttpClientUploader {
   }
 
   protected static JSONObject parseSliceUploadResponse(String resp) {
-    com.alibaba.fastjson.JSONObject object = JSON.parseObject(resp);
-    com.alibaba.fastjson.JSONObject data = object.getJSONObject("data");
-    return data;
+    if (!AVUtils.isBlankContent(resp)) {
+      try {
+        com.alibaba.fastjson.JSONObject object = JSON.parseObject(resp);
+        com.alibaba.fastjson.JSONObject data = object.getJSONObject("data");
+        return data;
+      } catch (Exception e) {
+      }
+    }
+    return null;
   }
 
   protected static int getCurrentSliceLength(int sliceCount, int totalSize) {

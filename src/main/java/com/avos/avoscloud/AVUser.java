@@ -1179,14 +1179,14 @@ public class AVUser extends AVObject {
    * 调用这个方法会给用户的邮箱发送一封验证邮件，让用户能够确认在AVOS Cloud网站上注册的账号邮箱
    * </p>
    * <p>
-   * 除非是在一个后台线程中调用这个方法， 否则，一般情况下，请使用AVUser.requestEmailVerfiyInBackground(email,callback)方法进行调用
+   * 除非是在一个后台线程中调用这个方法， 否则，一般情况下，请使用AVUser.requestEmailVerifyInBackground(email,callback)方法进行调用
    * 
    * </p>
    * 
    * @param email The email address associated with the user that forgot their password.
    */
   public static void requestEmailVerify(String email) {
-    requestEmailVerfiyInBackground(email, true, null);
+    requestEmailVerifyInBackground(email, true, null);
   }
 
   /**
@@ -1200,12 +1200,21 @@ public class AVUser extends AVObject {
    * @param email The email address associated with the user that forgot their password.
    * @param callback callback.done(e) is called when the request completes.
    */
-  public static void requestEmailVerfiyInBackground(String email,
-      RequestEmailVerifyCallback callback) {
-    requestEmailVerfiyInBackground(email, false, callback);
+  public static void requestEmailVerifyInBackground(String email,
+                                                    RequestEmailVerifyCallback callback) {
+    requestEmailVerifyInBackground(email, false, callback);
   }
 
-  private static void requestEmailVerfiyInBackground(String email, boolean sync,
+  /**
+   * @deprecated Use {@link #requestEmailVerifyInBackground(String, RequestEmailVerifyCallback)} instead.
+   */
+  @Deprecated
+  public static void requestEmailVerfiyInBackground(String email,
+      RequestEmailVerifyCallback callback) {
+    requestEmailVerifyInBackground(email, false, callback);
+  }
+
+  private static void requestEmailVerifyInBackground(String email, boolean sync,
       RequestEmailVerifyCallback callback) {
     final RequestEmailVerifyCallback internalCallback = callback;
     if (AVUtils.isBlankString(email) || !AVUtils.checkEmailAddress(email)) {
