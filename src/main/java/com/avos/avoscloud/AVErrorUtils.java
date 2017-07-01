@@ -1,5 +1,6 @@
 package com.avos.avoscloud;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -34,6 +35,29 @@ public class AVErrorUtils {
       return new AVException(AVException.UNKNOWN, "unknown reason");
     }
 
+  }
+
+  // [{"error":{"code":142,"error":"Cloud Code validation failed. Error detail : Error from
+  // beforeDelete"}},{"success":{}}]
+  public static AVException[] createExceptions(String content) {
+    try {
+      JSONArray array = new JSONArray(content);
+      AVException[] result = new AVException[array.length()];
+      for (int i = 0; i < array.length(); i++) {
+        if (!(array.get(i) instanceof JSONObject)) {
+          continue;
+        }
+        JSONObject jobj = (JSONObject) array.get(i);
+        if (!jobj.has("error")) {
+          continue;
+        }
+        JSONObject error = (JSONObject) jobj.get("error");
+        result[i] = new AVException(error.getInt("code"), error.getString("error"));
+      }
+      return result;
+    } catch (Exception exception) {
+      return new AVException[] {new AVException(AVException.UNKNOWN, content)};
+    }
   }
 
   static int errorCode(String content) {
