@@ -2,13 +2,16 @@ package com.avos.avoscloud;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -121,6 +124,12 @@ public class AVObject implements Parcelable {
   Map<String, AVOp> tempDataForServerSaving;
   ReadWriteLock lock = new ReentrantReadWriteLock();
 
+  public enum Hook {
+    beforeSave, afterSave, beforeUpdate, afterUpdate, beforeDelete, afterDelete,
+  }
+
+  private Set<Hook> ignoreHooks;
+
   public AVObject() {
     super();
     serverData = new HashMap<String, Object>();
@@ -128,6 +137,7 @@ public class AVObject implements Parcelable {
     instanceData = new HashMap<String, Object>();
     tempDataForServerSaving = new HashMap<String, AVOp>();
     className = getSubClassName(this.getClass());
+    ignoreHooks = new TreeSet<Hook>();
     init();
   }
 
@@ -576,7 +586,7 @@ public class AVObject implements Parcelable {
   }
 
   private static void deleteAll(boolean sync, boolean isEventually,
-      Collection<? extends AVObject> objects, DeleteCallback callback) {
+      Collection<? extends AVObject> objects, final DeleteCallback callback) {
     if (objects == null || objects.isEmpty()) {
       callback.internalDone(null, null);
       return;
@@ -588,10 +598,9 @@ public class AVObject implements Parcelable {
       }
     } else {
       String className = null;
-      boolean wasFirst = true;
-      StringBuilder sb = new StringBuilder();
       for (AVObject object : objects) {
-        if (AVUtils.isBlankString(object.getClassName()) || AVUtils.isBlankString(object.objectId)) {
+        if (AVUtils.isBlankString(object.getClassName())
+            || AVUtils.isBlankString(object.objectId)) {
           throw new IllegalArgumentException(
               "Invalid AVObject, the class name or objectId is blank.");
         }
@@ -600,32 +609,68 @@ public class AVObject implements Parcelable {
         } else if (!className.equals(object.getClassName())) {
           throw new IllegalArgumentException("The objects class name must be the same.");
         }
+      }
+
+      final Map<Set<Hook>, List<AVObject>> objectGroups = new HashMap<Set<Hook>, List<AVObject>>();
+      for (AVObject object : objects) {
+        List<AVObject> objs = objectGroups.get(object.ignoreHooks);
+        if (objs == null) {
+          objs = new ArrayList<AVObject>();
+          objectGroups.put(object.ignoreHooks, objs);
+        }
+        objs.add(object);
+      }
+      PaasClient.storageInstance().postBatchObject(getBatchDeleteRequest(objectGroups), sync, null,
+          new GenericObjectCallback() {
+            @Override
+            public void onSuccess(String content, AVException e) {
+              if (callback == null) {
+                return;
+              }
+              AVException[] exceptions = AVErrorUtils.createExceptions(content);
+              for (AVException avException : exceptions) {
+                if (avException != null) {
+                  callback.internalDone(null, avException);
+                  return;
+                }
+              }
+              callback.internalDone(null, null);
+            }
+
+            @Override
+            public void onFailure(Throwable error, String content) {
+              if (callback != null) {
+                callback.internalDone(null, AVErrorUtils.createException(error, content));
+              }
+            }
+          });
+    }
+  }
+
+  private static List<Object> getBatchDeleteRequest(
+      Map<Set<Hook>, List<AVObject>> objectGroups) {
+    List<Object> result = new ArrayList<Object>();
+    for (Entry<Set<Hook>, List<AVObject>> entry : objectGroups.entrySet()) {
+      boolean wasFirst = true;
+      Map<String, Object> ignoreHookParams = Collections.emptyMap();
+      StringBuilder sb = new StringBuilder();
+      for (AVObject object : entry.getValue()) {
         if (wasFirst) {
-          sb.append(AVPowerfulUtils.getEndpoint(object));
+          sb.append(AVPowerfulUtils.getBatchEndpoint(PaasClient.storageInstance().getApiVersion(),
+              object));
           wasFirst = false;
+          ignoreHookParams = object.getIgnoreHookParams();
         } else {
           sb.append(",").append(object.getObjectId());
         }
       }
-
-      final DeleteCallback internalCallback = callback;
-      String endpoint = sb.toString();
-      PaasClient.storageInstance().deleteObject(endpoint, sync, false, new GenericObjectCallback() {
-        @Override
-        public void onSuccess(String content, AVException e) {
-          if (internalCallback != null) {
-            internalCallback.internalDone(null, null);
-          }
-        }
-
-        @Override
-        public void onFailure(Throwable error, String content) {
-          if (internalCallback != null) {
-            internalCallback.internalDone(null, AVErrorUtils.createException(error, content));
-          }
-        }
-      }, null, null);
+      Map<String, Object> request = new HashMap<String, Object>();
+      request.put("method", "DELETE");
+      request.put("path", sb.toString());
+      request.put("body", ignoreHookParams);
+      result.add(request);
     }
+    return result;
   }
 
   /**
@@ -723,21 +768,23 @@ public class AVObject implements Parcelable {
       url = AVUtils.addQueryParams(url, whereMap);
     }
 
-    PaasClient.storageInstance().deleteObject(url, sync, isEventually, new GenericObjectCallback() {
-      @Override
-      public void onSuccess(String content, AVException e) {
-        if (internalCallback != null) {
-          internalCallback.internalDone(null, null);
-        }
-      }
+    Map<String, Object> body = getIgnoreHookParams();
+    PaasClient.storageInstance().deleteObject(url, body, sync, isEventually,
+        new GenericObjectCallback() {
+          @Override
+          public void onSuccess(String content, AVException e) {
+            if (internalCallback != null) {
+              internalCallback.internalDone(null, null);
+            }
+          }
 
-      @Override
-      public void onFailure(Throwable error, String content) {
-        if (internalCallback != null) {
-          internalCallback.internalDone(null, AVErrorUtils.createException(error, content));
-        }
-      }
-    }, this.getObjectId(), internalId());
+          @Override
+          public void onFailure(Throwable error, String content) {
+            if (internalCallback != null) {
+              internalCallback.internalDone(null, AVErrorUtils.createException(error, content));
+            }
+          }
+        }, this.getObjectId(), internalId());
   }
 
   public AVObject fetch() throws AVException {
@@ -1929,6 +1976,15 @@ public class AVObject implements Parcelable {
     }
   }
 
+  private Map<String, Object> getIgnoreHookParams() {
+    if (ignoreHooks.size() == 0) {
+      return Collections.emptyMap();
+    }
+    Map<String, Object> result = new HashMap<String, Object>(1);
+    result.put("__ignore_hooks", ignoreHooks);
+    return result;
+  }
+
 
   // ================================================================================
   // Batch save
@@ -2112,6 +2168,7 @@ public class AVObject implements Parcelable {
           parseOperation(body, key, op, children, unSavedChildren, requestQueue);
         }
         this.mergeRequestQueue(wrapperRequestBody(body, children, false), requestQueue);
+        body.putAll(getIgnoreHookParams());
       }
     } else if (!instanceData.isEmpty()) {
       body = new HashMap<String, Object>();
@@ -2589,4 +2646,17 @@ public class AVObject implements Parcelable {
       return new AVObject[i];
     }
   }
+
+  public void disableBeforeHook() {
+    Collections.addAll(ignoreHooks, Hook.beforeSave, Hook.beforeUpdate, Hook.beforeDelete);
+  }
+
+  public void disableAfterHook() {
+    Collections.addAll(ignoreHooks, Hook.afterSave, Hook.afterUpdate, Hook.afterDelete);
+  }
+
+  public void ignoreHook(Hook hook) {
+    ignoreHooks.add(hook);
+  }
+
 }
