@@ -28,8 +28,8 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git://github.com/leancloud/java-common.git</connection>
-    <developerConnection>scm:git:ssh://github.com:leancloud/java-common.git</developerConnection>
+    <connection>scm:git:https://github.com/leancloud/java-common.git</connection>
+    <developerConnection>scm:git:git@github.com:leancloud/java-common.git</developerConnection>
     <url>http://github.com/leancloud/java-common/tree/master</url>
   </scm>
 
