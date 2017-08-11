@@ -10,6 +10,7 @@ import com.avos.avoscloud.internal.AppConfiguration.StorageType;
 import com.avos.avoscloud.internal.InternalConfigurationController;
 import com.avos.avoscloud.internal.InternalFileDownloader;
 import com.avos.avoscloud.utils.MimeTypeMap;
+import org.json.JSONObject;
 
 
 /**
@@ -31,6 +32,15 @@ import com.avos.avoscloud.utils.MimeTypeMap;
  * </pre>
  */
 public final class AVFile {
+
+  private static final String KEY_URL = "url";
+  private static final String KEY_TYPE = "__type";
+  private static final String KEY_NAME = "_name";
+  private static final String KEY_METADATA_SIZE = "size";
+  private static final String KEY_METADATA_OWNER = "owner";
+  private static final String KEY_SOURCE = "__source";
+  private static final String KEY_METADATA = "metaData";
+  private static final String KEY_METADATA_CHECK_SUM = "_checksum";
 
   /**
    * 需要上传但是未上传的 dirty 会标记为 true
@@ -59,12 +69,11 @@ public final class AVFile {
   // metadata for file,added by dennis<xzhuang@avos.com>,2013-09-06
   private final HashMap<String, Object> metaData = new HashMap<String, Object>();
   private static String defaultMimeType = "application/octet-stream";
-  private static final String FILE_SUM_KEY = "_checksum";
-  static final String FILE_NAME_KEY = "_name";
+
+
   private String objectId;
   private AVObject fileObject;
   private String bucket;
-  private static final String ELDERMETADATAKEYFORIOSFIX = "metadata";
   private AVACL acl;
   private byte[] data;
 
@@ -107,7 +116,7 @@ public final class AVFile {
     if (metaData != null) {
       this.metaData.putAll(metaData);
     }
-    this.metaData.put("__source", "external");
+    this.metaData.put(KEY_SOURCE, "external");
   }
 
 
@@ -142,15 +151,15 @@ public final class AVFile {
         this.data = data;
       }
 
-      this.metaData.put(FILE_SUM_KEY, md5);
-      this.metaData.put("size", data.length);
+      this.metaData.put(KEY_METADATA_CHECK_SUM, md5);
+      this.metaData.put(KEY_METADATA_SIZE, data.length);
     } else {
-      this.metaData.put("size", 0);
+      this.metaData.put(KEY_METADATA_SIZE, 0);
     }
 
     AVUser currentUser = AVUser.getCurrentUser();
-    this.metaData.put("owner", currentUser != null ? currentUser.getObjectId() : "");
-    this.metaData.put(FILE_NAME_KEY, name);
+    this.metaData.put(KEY_METADATA_OWNER, currentUser != null ? currentUser.getObjectId() : "");
+    this.metaData.put(KEY_NAME, name);
   }
 
   protected AVFile(String name, String url) {
@@ -294,19 +303,19 @@ public final class AVFile {
   }
 
   private static AVFile createFileFromAVObject(AVObject object) {
-    AVFile file = new AVFile(object.getObjectId(), object.getString("url"));
-    if (object.getMap(ELDERMETADATAKEYFORIOSFIX) != null
-        && !object.getMap(ELDERMETADATAKEYFORIOSFIX).isEmpty()) {
-      file.metaData.putAll(object.getMap(ELDERMETADATAKEYFORIOSFIX));
+    AVFile file = new AVFile(object.getObjectId(), object.getString(KEY_URL));
+    if (object.getMap(KEY_METADATA) != null
+        && !object.getMap(KEY_METADATA).isEmpty()) {
+      file.metaData.putAll(object.getMap(KEY_METADATA));
     }
-    if (object.getMap("metaData") != null) {
-      file.metaData.putAll(object.getMap("metaData"));
+    if (object.getMap(KEY_METADATA) != null) {
+      file.metaData.putAll(object.getMap(KEY_METADATA));
     }
     file.setObjectId(object.getObjectId());
     file.fileObject = object;
     file.setBucket((String) object.get("bucket"));
-    if (!file.metaData.containsKey(FILE_NAME_KEY)) {
-      file.metaData.put(FILE_NAME_KEY, object.getString("name"));
+    if (!file.metaData.containsKey(KEY_NAME)) {
+      file.metaData.put(KEY_NAME, object.getString("name"));
     }
     return file;
   }
@@ -384,14 +393,14 @@ public final class AVFile {
         InternalConfigurationController.globalInstance().getInternalPersistence()
             .readContentBytesFromFile(file);
     if (null != data) {
-      avFile.metaData.put(FILE_SUM_KEY, AVUtils.computeMD5(data));
-      avFile.metaData.put("size", file.length());
+      avFile.metaData.put(KEY_METADATA_CHECK_SUM, AVUtils.computeMD5(data));
+      avFile.metaData.put(KEY_METADATA_SIZE, file.length());
     } else {
-      avFile.metaData.put("size", 0);
+      avFile.metaData.put(KEY_METADATA_SIZE, 0);
     }
     AVUser currentUser = AVUser.getCurrentUser();
-    avFile.metaData.put("owner", currentUser != null ? currentUser.getObjectId() : "");
-    avFile.metaData.put(FILE_NAME_KEY, name);
+    avFile.metaData.put(KEY_METADATA_OWNER, currentUser != null ? currentUser.getObjectId() : "");
+    avFile.metaData.put(KEY_NAME, name);
     return avFile;
   }
 
@@ -435,7 +444,7 @@ public final class AVFile {
    * @since 1.3.4
    */
   public int getSize() {
-    Number size = (Number) getMetaData("size");
+    Number size = (Number) getMetaData(KEY_METADATA_SIZE);
     if (size != null)
       return size.intValue();
     else
@@ -449,7 +458,7 @@ public final class AVFile {
    * @since 1.3.4
    */
   public String getOwnerObjectId() {
-    return (String) getMetaData("owner");
+    return (String) getMetaData(KEY_METADATA_OWNER);
   }
 
   /**
@@ -484,7 +493,7 @@ public final class AVFile {
    * @return get file name
    */
   public String getOriginalName() {
-    return (String) metaData.get(FILE_NAME_KEY);
+    return (String) metaData.get(KEY_NAME);
   }
 
   /**
@@ -924,9 +933,67 @@ public final class AVFile {
   }
 
   protected org.json.JSONObject toJSONObject() {
-    org.json.JSONObject object = new org.json.JSONObject();
-    Map<String, Object> data = AVUtils.mapFromFile(this);
-    data.put("url", url);
-    return object;
+    return new JSONObject(toMap());
+  }
+
+  public Map<String, Object> toMap() {
+    Map<String, Object> result = new HashMap<String, Object>();
+    result.put(KEY_TYPE, AVFile.className());
+    result.put(KEY_METADATA, getMetaData());
+
+    if (!AVUtils.isBlankString(getUrl())) {
+      result.put(KEY_URL, url);
+    }
+
+    if (!AVUtils.isBlankString(getObjectId())) {
+      result.put(AVObject.OBJECT_ID, getObjectId());
+    }
+
+    switch (InternalConfigurationController.globalInstance().getAppConfiguration().getStorageType()) {
+      case StorageTypeAV:
+        result.put("name", getName());
+        break;
+      case StorageTypeQiniu:
+      case StorageTypeS3:
+        // we store the objectId in file.name
+        result.put("id", getName());
+        break;
+      default:
+        break;
+    }
+
+    return result;
+  }
+
+  public static AVFile fileFromMap(Map<String, Object> map) {
+    AVFile file = new AVFile("", "");
+    AVUtils.copyPropertiesFromMapToObject(map, file);
+    Object metadata = map.get(KEY_METADATA);
+    if (metadata != null && metadata instanceof Map) {
+      file.getMetaData().putAll((Map) metadata);
+    }
+    if (AVUtils.isBlankString((String) file.getMetaData(KEY_NAME))) {
+      file.getMetaData().put(KEY_NAME, file.getName());
+    }
+
+    if (map.containsKey(KEY_URL)) {
+      file.setUrl((String)map.get(KEY_URL));
+    }
+
+    // maybe there isnt url in dict, so we need do some trick
+    switch (InternalConfigurationController.globalInstance().getAppConfiguration().getStorageType()) {
+      case StorageTypeAV:
+        break;
+      case StorageTypeQiniu:
+        // file.setUrl(QiniuUploader.getFileLink((String) map.get("bucket"),
+        // (String) map.get("key")));
+      case StorageTypeS3:
+        file.setName((String) map.get(AVObject.OBJECT_ID));
+        break;
+      default:
+        break;
+    }
+
+    return file;
   }
 }
