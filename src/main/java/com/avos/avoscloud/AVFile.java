@@ -959,7 +959,7 @@ public final class AVFile {
         result.put("id", getName());
         break;
       default:
-        break;
+        throw new UnsupportedOperationException("storage type unsupport!");
     }
 
     return result;
@@ -991,7 +991,7 @@ public final class AVFile {
         file.setName((String) map.get(AVObject.OBJECT_ID));
         break;
       default:
-        break;
+        throw new UnsupportedOperationException("storage type unsupport!");
     }
 
     return file;
