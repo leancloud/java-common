@@ -945,6 +945,10 @@ public final class AVFile {
       result.put(KEY_URL, url);
     }
 
+    if (!AVUtils.isBlankString(getObjectId())) {
+      result.put(AVObject.OBJECT_ID, getObjectId());
+    }
+
     switch (InternalConfigurationController.globalInstance().getAppConfiguration().getStorageType()) {
       case StorageTypeAV:
         result.put("name", getName());
