@@ -10,6 +10,7 @@ import com.avos.avoscloud.internal.AppConfiguration.StorageType;
 import com.avos.avoscloud.internal.InternalConfigurationController;
 import com.avos.avoscloud.internal.InternalFileDownloader;
 import com.avos.avoscloud.utils.MimeTypeMap;
+import org.json.JSONObject;
 
 
 /**
@@ -932,10 +933,7 @@ public final class AVFile {
   }
 
   protected org.json.JSONObject toJSONObject() {
-    org.json.JSONObject object = new org.json.JSONObject();
-    Map<String, Object> data = toHashMap();
-
-    return object;
+    return new JSONObject(toHashMap());
   }
 
   public Map<String, Object> toHashMap() {
