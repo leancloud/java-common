@@ -10,6 +10,8 @@ import com.avos.avoscloud.AVUtils;
 
 public abstract class AppConfiguration {
 
+  private final String applicationIdField = "X-LC-Id";
+  private final String apiKeyField = "X-LC-Key";
   String applicationId;
   String clientKey;
   protected StorageType storageType = StorageType.StorageTypeQiniu;
@@ -62,4 +64,22 @@ public abstract class AppConfiguration {
   public void setClientKey(String clientKey) {
     this.clientKey = clientKey;
   }
+
+  public Map<String, String> getRequestHeaders() {
+    Map<String, String> result = new HashMap<String, String>();
+    result.put(applicationIdField, applicationId);
+    return result;
+  }
+
+  public String dumpRequestHeaders() {
+    return String.format("-H \"%s: %s\" -H \"%s: %s\"", applicationIdField, applicationId,
+        apiKeyField, dumpKey(clientKey, "YourAppKey"));
+  }
+
+  protected String dumpKey(String key, String mask) {
+    return InternalConfigurationController.globalInstance().getInternalLogger()
+        .showInternalDebugLog() ? 
+      key : mask;
+  }
+
 }

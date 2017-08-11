@@ -24,6 +24,9 @@ public class AVGeoPoint {
   private double latitude;
   private double longitude;
 
+  static final String LATITUDE_KEY = "latitude";
+  static final String LONGTITUDE_KEY = "longitude";
+
   /**
    * Creates a new default point with latitude and longitude set to 0.0.
    */

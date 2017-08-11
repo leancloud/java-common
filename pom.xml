@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>cn.leancloud</groupId>
   <artifactId>leancloud-common</artifactId>
-  <version>0.1.9</version>
+  <version>0.1.13-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>leancloud-common</name>
@@ -28,9 +27,10 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git://github.com/leancloud/java-common.git</connection>
-    <developerConnection>scm:git:ssh://github.com:leancloud/java-common.git</developerConnection>
+    <connection>scm:git:https://github.com/leancloud/java-common.git</connection>
+    <developerConnection>scm:git:git@github.com:leancloud/java-common.git</developerConnection>
     <url>http://github.com/leancloud/java-common/tree/master</url>
+    <tag>HEAD</tag>
   </scm>
 
   <distributionManagement>
@@ -160,6 +160,11 @@
 	  <target>1.7</target>
 	  <encoding>${project.build.sourceEncoding}</encoding>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.5.3</version>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>

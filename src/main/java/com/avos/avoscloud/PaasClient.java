@@ -49,8 +49,6 @@ public class PaasClient {
 
   private final String apiVersion;
 
-  private static String applicationIdField = "X-LC-Id";
-  private static String apiKeyField = "X-LC-Key";
   protected static String sessionTokenField = "X-LC-Session";
   private static boolean isCN = true;
   private boolean isProduction = true;
@@ -135,8 +133,6 @@ public class PaasClient {
     builder.header(sessionTokenField,
         (currAVUser != null && currAVUser.getSessionToken() != null) ? currAVUser.getSessionToken()
             : "");
-    builder.header(applicationIdField, InternalConfigurationController.globalInstance()
-        .getAppConfiguration().getApplicationId());
     builder.header("Accept", defaultContentType);
     builder.header("Content-Type", defaultContentType);
     builder.header("User-Agent", InternalConfigurationController.globalInstance()
@@ -144,6 +140,10 @@ public class PaasClient {
     builder.header("X-LC-Sign", InternalConfigurationController.globalInstance()
         .getInternalRequestSign().requestSign());
 
+    for (Map.Entry<String, String> entry : InternalConfigurationController.globalInstance()
+        .getAppConfiguration().getRequestHeaders().entrySet()) {
+      builder.header(entry.getKey(), entry.getValue());
+    }
 
     if (header != null) {
       for (Map.Entry<String, String> entry : header.entrySet()) {
@@ -524,11 +524,14 @@ public class PaasClient {
 
   public void deleteObject(final String relativePath, boolean sync, GenericObjectCallback callback,
       String objectId, String _internalId) {
-    deleteObject(relativePath, sync, false, callback, objectId, _internalId);
+    Map<String, Object> emptymap = Collections.emptyMap();
+    deleteObject(relativePath, emptymap, sync, false, callback, objectId,
+        _internalId);
   }
 
-
-  public void deleteObject(final String relativePath, boolean sync, boolean isEventually,
+  public void deleteObject(final String relativePath, Map<String, Object> object,
+      boolean sync,
+      boolean isEventually,
       GenericObjectCallback callback, String objectId, String _internalId) {
     try {
       if (isEventually) {
@@ -536,15 +539,17 @@ public class PaasClient {
         handleArchivedRequest(archivedFile, sync, callback);
       } else {
         String url = buildUrl(relativePath);
+        String body = AVUtils.jsonStringFromMapWithNull(object);
         if (InternalConfigurationController.globalInstance().getInternalLogger().isDebugEnabled()) {
-          dumpHttpDeleteRequest(null, url, null);
+          dumpHttpDeleteRequest(null, url, body);
         }
         AsyncHttpResponseHandler handler = createPostHandler(callback);
         AVHttpClient client = clientInstance();
         Request.Builder builder = new Request.Builder();
         updateHeaders(builder, null, callback != null && callback.isRequestStatisticNeed());
 
-        builder.url(url).delete();
+        builder.url(url)
+            .delete(RequestBody.create(AVHttpClient.JSON, body));
         client.execute(builder.build(), sync, handler);
       }
     } catch (Exception exception) {
@@ -679,32 +684,19 @@ public class PaasClient {
     String string = "";
     if (parameters != null) {
       string =
-          String.format("curl -X GET -H \"%s: %s\" -H \"%s: %s\" -G --data-urlencode \'%s\' %s",
-              applicationIdField, InternalConfigurationController.globalInstance()
-                  .getAppConfiguration().getApplicationId(), apiKeyField, getDebugClientKey(),
+          String.format("curl -X GET %s -G --data-urlencode \'%s\' %s",
+              InternalConfigurationController.globalInstance().getAppConfiguration().dumpRequestHeaders(),
               parameters, path);
     } else {
-      string =
-          String.format("curl -X GET -H \"%s: %s\" -H \"%s: %s\"  %s", applicationIdField,
-              InternalConfigurationController.globalInstance().getAppConfiguration()
-                  .getApplicationId(), apiKeyField, getDebugClientKey(), path);
+      string = String.format("curl -X GET %s %s", InternalConfigurationController.globalInstance()
+          .getAppConfiguration().dumpRequestHeaders(), path);
     }
     LogUtil.avlog.d(string);
   }
 
-  private String getDebugClientKey() {
-    if (InternalConfigurationController.globalInstance().getInternalLogger().showInternalDebugLog()) {
-      return InternalConfigurationController.globalInstance().getAppConfiguration().getClientKey();
-    } else {
-      return "YourAppKey";
-    }
-  }
-
   private String headerString(Map<String, String> header) {
     String string =
-        String.format(" -H \"%s: %s\" -H \"%s: %s\" ", applicationIdField,
-            InternalConfigurationController.globalInstance().getAppConfiguration()
-                .getApplicationId(), apiKeyField, getDebugClientKey());
+        InternalConfigurationController.globalInstance().getAppConfiguration().dumpRequestHeaders();
     StringBuilder sb = new StringBuilder(string);
     if (header != null) {
       for (Map.Entry<String, String> entry : header.entrySet()) {
