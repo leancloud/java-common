@@ -304,65 +304,6 @@ public class AVUtils {
     }
   }
 
-  /*
-   * // from parse { "__type": "File", "url":
-   * "http://files.parse.com/bc9f32df-2957-4bb1-93c9-ec47d9870a05/db295fb2-8a8b-49f3-aad3-dd911142f64f-hello.txt"
-   * , "name": "db295fb2-8a8b-49f3-aad3-dd911142f64f-hello.txt" } // from urulu(qiniu) { "__type":
-   * "File", "bucket": "x5ocz6du3qyn5jiay7xw", "createdAt": "2013-05-23T07:38:18.000Z", "key":
-   * "8dyu9yShs6hi47co", "mime_type": "application/octet-stream", "name": "sample.apk", "objectId":
-   * "519dc76ae4b034b9cc5170a8", "updatedAt": "2013-05-23T07:38:18.000Z" } // from urulu(s3) {
-   * "__type": "File", "createdAt": "2013-05-27T07:10:52.000Z", "objectId":
-   * "51a306fce4b06e53feb1d95f", "updatedAt": "2013-05-27T07:10:52.000Z", "url":
-   * "https://s3-ap-northeast-1.amazonaws.com/avos-cloud/b60b1e29-5314-4538-9759-2cb6d6c74185" }
-   */
-  public static Map<String, Object> mapFromFile(AVFile file) {
-    Map<String, Object> result = new HashMap<String, Object>();
-    result.put("__type", AVFile.className());
-    result.put("metaData", file.getMetaData());
-
-    switch (InternalConfigurationController.globalInstance().getAppConfiguration().getStorageType()) {
-      case StorageTypeAV:
-        result.put("name", file.getName());
-        break;
-      case StorageTypeQiniu:
-      case StorageTypeS3:
-        // we store the objectId in file.name
-        result.put("id", file.getName());
-        break;
-      default:
-        break;
-    }
-
-    return result;
-  }
-
-  public static AVFile fileFromMap(Map<String, Object> map) {
-    AVFile file = new AVFile("", "");
-    AVUtils.copyPropertiesFromMapToObject(map, file);
-    Object metadata = map.get("metaData");
-    if (metadata != null && metadata instanceof Map)
-      file.getMetaData().putAll((Map) metadata);
-    if (AVUtils.isBlankString((String) file.getMetaData(AVFile.FILE_NAME_KEY))) {
-      file.getMetaData().put(AVFile.FILE_NAME_KEY, file.getName());
-    }
-
-    // maybe there isnt url in dict, so we need do some trick
-    switch (InternalConfigurationController.globalInstance().getAppConfiguration().getStorageType()) {
-      case StorageTypeAV:
-        break;
-      case StorageTypeQiniu:
-        // file.setUrl(QiniuUploader.getFileLink((String) map.get("bucket"),
-        // (String) map.get("key")));
-      case StorageTypeS3:
-        file.setName((String) map.get("objectId"));
-        break;
-      default:
-        break;
-    }
-
-    return file;
-  }
-
   public static AVObject parseObjectFromMap(Map<String, Object> map) {
     AVObject object = newAVObjectByClassName((String) map.get(classNameTag));
     object.setObjectId((String) map.get("objectId"));
@@ -394,7 +335,7 @@ public class AVUtils {
     } else if (object instanceof byte[]) {
       return jsonStringFromMapWithNull(mapFromByteArray((byte[]) object));
     } else if (object instanceof AVFile) {
-      return jsonStringFromMapWithNull(mapFromFile((AVFile) object));
+      return jsonStringFromMapWithNull(((AVFile) object).toHashMap());
     } else if (object instanceof org.json.JSONObject) {
       return jsonStringFromObjectWithNull(JSON.parse(object.toString()));
     } else if (object instanceof org.json.JSONArray) {
@@ -539,10 +480,10 @@ public class AVUtils {
       byte[] data = dataFromMap(map);
       parent.put(key, data, false);
     } else if (isFile(type)) {
-      AVFile file = AVUtils.fileFromMap(map);
+      AVFile file = AVFile.fileFromMap(map);
       parent.put(key, file, false);
     } else if (isFileFromUrulu(map)) {
-      AVFile file = AVUtils.fileFromMap(map);
+      AVFile file = AVFile.fileFromMap(map);
       parent.put(key, file, false);
     } else if (isRelation(type)) {
       parent.addRelationFromServer(key, (String) map.get(classNameTag), false);
@@ -824,7 +765,7 @@ public class AVUtils {
       } else if (object instanceof byte[]) {
         return mapFromByteArray((byte[]) object);
       } else if (object instanceof AVFile) {
-        return mapFromFile((AVFile) object);
+        return ((AVFile) object).toHashMap();
       } else if (object instanceof org.json.JSONObject) {
         return JSON.parse(object.toString());
       } else if (object instanceof org.json.JSONArray) {
@@ -886,7 +827,7 @@ public class AVUtils {
     } else if (type.equals("Relation")) {
       return AVUtils.objectFromRelationMap(map);
     } else if (type.equals("File")) {
-      return AVUtils.fileFromMap(map);
+      return AVFile.fileFromMap(map);
     }
     return map;
   }

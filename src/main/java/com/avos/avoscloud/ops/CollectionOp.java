@@ -38,8 +38,7 @@ public abstract class CollectionOp extends BaseOp {
         Object realValue = AVUtils.mapFromPointerObject((AVObject) v);
         result.add(realValue);
       } else if (v instanceof AVFile) {
-        Object realValue = AVUtils.mapFromFile((AVFile) v);
-        result.add(realValue);
+        result.add(((AVFile) v).toHashMap());
       } else {
         result.add(v);
       }

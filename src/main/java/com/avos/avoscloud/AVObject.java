@@ -2141,7 +2141,7 @@ public class AVObject implements Parcelable {
     } else if (o instanceof byte[]) {
       body.put(key, AVUtils.mapFromByteArray((byte[]) o));
     } else if (o instanceof AVFile) {
-      body.put(key, AVUtils.mapFromFile((AVFile) o));
+      body.put(key, ((AVFile) o).toHashMap());
     } else {
       body.put(key, AVUtils.getParsedObject(o));
     }
