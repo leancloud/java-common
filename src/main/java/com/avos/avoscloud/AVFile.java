@@ -933,10 +933,10 @@ public final class AVFile {
   }
 
   protected org.json.JSONObject toJSONObject() {
-    return new JSONObject(toHashMap());
+    return new JSONObject(toMap());
   }
 
-  public Map<String, Object> toHashMap() {
+  public Map<String, Object> toMap() {
     Map<String, Object> result = new HashMap<String, Object>();
     result.put(KEY_TYPE, AVFile.className());
     result.put(KEY_METADATA, getMetaData());

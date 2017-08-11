@@ -304,6 +304,16 @@ public class AVUtils {
     }
   }
 
+  @Deprecated
+  public static Map<String, Object> mapFromFile(AVFile file) {
+    return file.toMap();
+  }
+
+  @Deprecated
+  public static AVFile fileFromMap(Map<String, Object> map) {
+    return AVFile.fileFromMap(map);
+  }
+
   public static AVObject parseObjectFromMap(Map<String, Object> map) {
     AVObject object = newAVObjectByClassName((String) map.get(classNameTag));
     object.setObjectId((String) map.get("objectId"));
@@ -335,7 +345,7 @@ public class AVUtils {
     } else if (object instanceof byte[]) {
       return jsonStringFromMapWithNull(mapFromByteArray((byte[]) object));
     } else if (object instanceof AVFile) {
-      return jsonStringFromMapWithNull(((AVFile) object).toHashMap());
+      return jsonStringFromMapWithNull(((AVFile) object).toMap());
     } else if (object instanceof org.json.JSONObject) {
       return jsonStringFromObjectWithNull(JSON.parse(object.toString()));
     } else if (object instanceof org.json.JSONArray) {
@@ -765,7 +775,7 @@ public class AVUtils {
       } else if (object instanceof byte[]) {
         return mapFromByteArray((byte[]) object);
       } else if (object instanceof AVFile) {
-        return ((AVFile) object).toHashMap();
+        return ((AVFile) object).toMap();
       } else if (object instanceof org.json.JSONObject) {
         return JSON.parse(object.toString());
       } else if (object instanceof org.json.JSONArray) {
