@@ -69,16 +69,14 @@ class FileUploader extends HttpClientUploader {
 
 
   private Uploader getUploaderImplementation(String fileKey) {
-    switch (provider) {
-      case "qcloud":
-        return new QCloudUploader(parseFile, fileKey, token, uploadUrl, saveCallback,
-            progressCallback);
-      case "s3":
-        return new S3Uploader(parseFile, uploadUrl, saveCallback, progressCallback);
-      default:
-        return new QiniuUploader(parseFile, token, fileKey, saveCallback, progressCallback);
+    if ("qcloud".equals(provider)) {
+      return new QCloudUploader(parseFile, fileKey, token, uploadUrl, saveCallback,
+          progressCallback);
+    } else if ("s3".equals(provider)) {
+      return new S3Uploader(parseFile, uploadUrl, saveCallback, progressCallback);
+    } else {
+      return new QiniuUploader(parseFile, token, fileKey, saveCallback, progressCallback);
     }
-
   }
 
   private AVException fetchUploadBucket(String path, String fileKey, boolean sync,
