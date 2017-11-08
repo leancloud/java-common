@@ -1257,7 +1257,7 @@ public class AVUtils {
   }
 
   public static String addQueryParams(String path, Map<String, Object> params) {
-    LinkedList<NameValuePair> pairs = new LinkedList<>();
+    LinkedList<NameValuePair> pairs = new LinkedList<NameValuePair>();
     for (Map.Entry<String, Object> entry : params.entrySet()) {
       pairs.add(new BasicNameValuePair(entry.getKey(), JSON.toJSONString(entry.getValue())));
     }

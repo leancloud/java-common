@@ -761,7 +761,7 @@ public class AVObject implements Parcelable {
       }
       Map<String, Object> whereOperationMap = null;
       whereOperationMap = option.matchQuery.conditions.compileWhereOperationMap();
-      Map<String, Object> whereMap = new HashMap<>();
+      Map<String, Object> whereMap = new HashMap<String, Object>();
       if ((whereOperationMap != null && !whereOperationMap.isEmpty())) {
         whereMap.put("where", whereOperationMap);
       }
@@ -1963,7 +1963,7 @@ public class AVObject implements Parcelable {
     }
     if (pendingRequests.size() >= 1) {
       Map<String, Object> thisObjectPendingRequest = pendingRequests.get(0);
-      Map<String, Object> whereMap = new HashMap<>();
+      Map<String, Object> whereMap = new HashMap<String, Object>();
       if ((whereOperationMap != null && !whereOperationMap.isEmpty())) {
         whereMap.put("where", whereOperationMap);
       }

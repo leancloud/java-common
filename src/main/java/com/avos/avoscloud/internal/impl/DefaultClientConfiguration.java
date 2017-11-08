@@ -7,7 +7,7 @@ import com.avos.avoscloud.internal.InternalClientConfiguration;
 import com.avos.avoscloud.okhttp.Interceptor;
 
 public class DefaultClientConfiguration extends InternalClientConfiguration {
-  List<Interceptor> clientInterceptors = new LinkedList<>();
+  List<Interceptor> clientInterceptors = new LinkedList<Interceptor>();
   private final static String sdkVersion = "JavaSDK/0.1.6";
 
   @Override

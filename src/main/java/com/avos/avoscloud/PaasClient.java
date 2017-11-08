@@ -50,7 +50,7 @@ public class PaasClient {
   private final String apiVersion;
 
   protected static String sessionTokenField = "X-LC-Session";
-  private static boolean isCN = true;
+  private final AVOSServices service;
   private boolean isProduction = true;
 
   private static final String defaultEncoding = "UTF-8";
@@ -62,9 +62,8 @@ public class PaasClient {
   private volatile AVHttpClient httpClient;
   private static boolean lastModifyEnabled = false;
   private static String REQUEST_STATIS_HEADER = "X-Android-RS";
-  private String baseUrl;
 
-  static Map<String, PaasClient> serviceClientMap = new HashMap<String, PaasClient>();
+  static Map<AVOSServices, PaasClient> serviceClientMap = new HashMap<AVOSServices, PaasClient>();
   static Map<String, AVObjectReferenceCount> internalObjectsForEventuallySave = Collections
       .synchronizedMap(new HashMap<String, AVObjectReferenceCount>());
 
@@ -76,28 +75,24 @@ public class PaasClient {
   }
 
   protected static PaasClient sharedInstance(AVOSServices service) {
-    String host =
-        InternalConfigurationController.globalInstance().getAppConfiguration()
-            .getService(service.toString());
-    PaasClient instance = serviceClientMap.get(host);
+    PaasClient instance = serviceClientMap.get(service);
     if (instance == null) {
-      instance = new PaasClient();
-      instance.setBaseUrl(host);
-      serviceClientMap.put(host, instance);
+      instance = new PaasClient(service);
+      serviceClientMap.put(service, instance);
     }
     return instance;
   }
 
   public static PaasClient storageInstance() {
-    return sharedInstance(AVOSServices.STORAGE_SERVICE);
+    return sharedInstance(AVOSServices.API);
   }
 
   public static PaasClient cloudInstance() {
-    return sharedInstance(AVOSServices.FUNCTION_SERVICE);
+    return sharedInstance(AVOSServices.ENGINE);
   }
 
   public static PaasClient statistisInstance() {
-    return sharedInstance(AVOSServices.STATISTICS_SERVICE);
+    return sharedInstance(AVOSServices.STATS);
   }
 
   AVACL getDefaultACL() {
@@ -116,9 +111,9 @@ public class PaasClient {
     return null;
   }
 
-  private PaasClient() {
+  private PaasClient(AVOSServices service) {
     apiVersion = "1.1";
-    useUruluServer();
+    this.service = service;
   }
 
   protected void updateHeaders(Request.Builder builder, Map<String, String> header,
@@ -165,44 +160,9 @@ public class PaasClient {
     return httpClient;
   }
 
-
-
-  public void useUruluServer() {
-    if (isCN) {
-      useAVCloudCN();
-    } else {
-      useAVCloudUS();
-    }
-  }
-
-  public static void useAVCloudUS() {
-    isCN = false;
-  }
-
-  protected static void updateAPIServer(String apiServer) {
-    if (isCN) {
-      InternalConfigurationController.globalInstance().getAppConfiguration()
-          .configureService(AVOSServices.STORAGE_SERVICE.toString(), apiServer);
-    } else {
-      InternalConfigurationController
-          .globalInstance()
-          .getAppConfiguration()
-          .configureService(AVOSServices.STORAGE_SERVICE.toString(),
-              AppRouterManager.DEFAULT_US_API_SERVER);
-    }
-  }
-
-  public static void useAVCloudCN() {
-    isCN = true;
-  }
-
-  protected static void useLocalStg() {
-    InternalConfigurationController.globalInstance().getAppConfiguration()
-        .configureService(AVOSServices.STORAGE_SERVICE.toString(), "https://cn-stg1.avoscloud.com");
-  }
-
   public String buildUrl(final String path) {
-    return String.format("%s/%s/%s", this.baseUrl, apiVersion, path);
+    return String.format("%s/%s/%s", InternalConfigurationController.globalInstance()
+        .getAppConfiguration().getServerUrl(service), apiVersion, path);
   }
 
   public String buildUrl(final String path, AVRequestParams params) {
@@ -216,7 +176,8 @@ public class PaasClient {
   }
 
   private String batchUrl() {
-    return String.format("%s/%s/batch", this.baseUrl, apiVersion);
+    return String.format("%s/%s/batch", InternalConfigurationController.globalInstance()
+        .getAppConfiguration().getServerUrl(service), apiVersion);
   }
 
   private String batchSaveRelativeUrl() {
@@ -237,19 +198,6 @@ public class PaasClient {
 
   public String getApiVersion() {
     return apiVersion;
-  }
-
-  protected void setBaseUrl(final String url) {
-    this.baseUrl = url;
-  }
-
-  public String getBaseUrl() {
-    return this.baseUrl;
-  }
-
-  protected static void setServiceHost(AVOSServices service, String host) {
-    InternalConfigurationController.globalInstance().getAppConfiguration()
-        .configureService(service.toString(), host);
   }
 
   public String getObject(final String relativePath, final AVRequestParams parameters,
