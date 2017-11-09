@@ -1,15 +1,21 @@
 package com.avos.avoscloud;
 
+import java.util.Map;
+
 import com.alibaba.fastjson.JSON;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
-
-import java.util.Map;
 
 /**
  * Created by wli on 2017/8/11.
  */
 public class AVFileTest extends TestCase {
+
+  @Override
+  public void setUp() {
+    TestApp.init();
+  }
 
     public void testFileFromMap() {
         String FILE_JSON_STR = "{\"mime_type\":\"image\\/png\",\"updatedAt\":\"2017-08-09T03:41:53.225Z\",\"key\":\"1bf9754d1ec4e16bb7f8.png\",\"name\":\"name.png\",\"objectId\":\"598a848161ff4b006c409d80\",\"createdAt\":\"2017-08-09T03:41:53.225Z\",\"__type\":\"File\",\"url\":\"testurl\",\"provider\":\"qiniu\",\"metaData\":{\"size\":2860076,\"owner\":\"unknown\"},\"bucket\":\"I4ObRReg\"}";
