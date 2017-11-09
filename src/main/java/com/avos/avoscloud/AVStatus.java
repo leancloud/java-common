@@ -111,7 +111,7 @@ public class AVStatus extends AVObject {
   }
 
   @Override
-  protected void setCreatedAt(String date) {
+  public void setCreatedAt(String date) {
     this.createdAt = date;
   }
 

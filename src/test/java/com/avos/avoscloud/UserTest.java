@@ -381,6 +381,7 @@ public class UserTest extends TestCase {
   }
 
   public void testSubUserDeserialize() throws Exception {
+    AVUser.registerSubclass(SubUser.class);
     SubUser.logIn("zengzhu", "12345678");
     String str = AVUser.getCurrentUser(SubUser.class).toString();
     SubUser user = (SubUser) AVObject.parseAVObject(str);
