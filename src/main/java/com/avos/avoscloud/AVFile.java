@@ -84,6 +84,7 @@ public final class AVFile {
     }
   }
 
+  @JSONField(serialize = false)
   AVObject getFileObject() {
     if (fileObject == null && !AVUtils.isBlankString(objectId)) {
       fileObject = AVObject.createWithoutData("_File", objectId);
@@ -499,7 +500,7 @@ public final class AVFile {
   /**
    * @param name
    */
-  void setName(String name) {
+  public void setName(String name) {
     this.name = name;
   }
 
@@ -590,7 +591,7 @@ public final class AVFile {
     return resultUrl;
   }
 
-  void setUrl(String url) {
+  public void setUrl(String url) {
     this.url = url;
   }
 
@@ -924,7 +925,7 @@ public final class AVFile {
    * @return AVACL for AVFile object
    * @since 2.6.9
    */
-  protected AVACL getACL() {
+  public AVACL getACL() {
     return acl;
   }
 

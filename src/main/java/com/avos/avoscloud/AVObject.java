@@ -270,7 +270,7 @@ public class AVObject implements Parcelable {
   /*
    * Internal usesage.You SHOULD NOT invoke this method.
    */
-  void setCreatedAt(String createdAt) {
+  public void setCreatedAt(String createdAt) {
     this.createdAt = createdAt;
   }
 
@@ -1063,6 +1063,7 @@ public class AVObject implements Parcelable {
    * 
    * @return object class name
    */
+  @JSONField(serialize = false)
   public String getClassName() {
     if (AVUtils.isBlankString(className)) {
       className = getSubClassName(this.getClass());
@@ -2373,7 +2374,7 @@ public class AVObject implements Parcelable {
    * 
    * @param newObjectId id for AVObject
    */
-  public void setObjectId(String newObjectId) {
+  protected void setObjectId(String newObjectId) {
     objectId = newObjectId;
   }
 
