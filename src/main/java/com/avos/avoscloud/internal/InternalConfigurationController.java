@@ -8,6 +8,7 @@ import com.avos.avoscloud.GetDataCallback;
 import com.avos.avoscloud.LogUtil;
 import com.avos.avoscloud.ProgressCallback;
 import com.avos.avoscloud.internal.impl.DefaultAppConfiguration;
+import com.avos.avoscloud.internal.impl.DefaultAppRouter;
 import com.avos.avoscloud.internal.impl.DefaultClientConfiguration;
 import com.avos.avoscloud.internal.impl.DefaultInternalCacheImpementation;
 import com.avos.avoscloud.internal.impl.DefaultInternalCallback;
@@ -31,6 +32,7 @@ public class InternalConfigurationController {
     this.internalPersistence = EmptyPersistence.instance();
     this.internalRequestSign = DefaultInternalRequestSign.instance();
     this.downloadImplementation = null;
+    this.appRouter = DefaultAppRouter.instance();
   }
 
   private InternalConfigurationController(Builder builder) {
@@ -47,6 +49,7 @@ public class InternalConfigurationController {
     this.internalRequestSign =
         AVUtils.or(builder.internalRequestSign, DefaultInternalRequestSign.instance());
     this.downloadImplementation = builder.downloadImplementation;
+    this.appRouter = AVUtils.or(builder.appRouter, DefaultAppRouter.instance());
   }
 
   private volatile static InternalConfigurationController instance;
@@ -65,6 +68,7 @@ public class InternalConfigurationController {
   private final InternalLogger internalLogger;
   private final InternalPersistence internalPersistence;
   private final InternalRequestSign internalRequestSign;
+  private final AppRouter appRouter;
 
   private final Class<? extends InternalFileDownloader> downloadImplementation;
 
@@ -92,6 +96,10 @@ public class InternalConfigurationController {
     return internalPersistence;
   }
 
+  public AppRouter getAppRouter() {
+    return appRouter;
+  }
+
   public InternalFileDownloader getDownloaderInstance(ProgressCallback progressCallback,
       GetDataCallback getDataCallback) {
     InternalFileDownloader downloader = null;
@@ -104,7 +112,10 @@ public class InternalConfigurationController {
           Constructor constructor = downloadImplementation.getDeclaredConstructor();
           constructor.setAccessible(true);
           downloader = (InternalFileDownloader) constructor.newInstance();
-        } catch (SecurityException | NoSuchMethodException e1) {
+        } catch (SecurityException e1) {
+          // ignore
+        } catch (NoSuchMethodException e1) {
+          // ignore
         } catch (InstantiationException e1) {
           e1.printStackTrace();
         } catch (IllegalAccessException e1) {
@@ -138,6 +149,7 @@ public class InternalConfigurationController {
     InternalPersistence internalPersistence;
     InternalRequestSign internalRequestSign;
     Class<? extends InternalFileDownloader> downloadImplementation;
+    AppRouter appRouter;
 
     public Builder setDownloaderImplementation(Class<? extends InternalFileDownloader> clazz) {
       this.downloadImplementation = clazz;
@@ -179,6 +191,11 @@ public class InternalConfigurationController {
       return this;
     }
 
+    public Builder setAppRouter(AppRouter appRouter) {
+      this.appRouter = appRouter;
+      return this;
+    }
+
     public InternalConfigurationController build() {
       InternalConfigurationController configurationController =
           new InternalConfigurationController(this);
@@ -187,9 +204,9 @@ public class InternalConfigurationController {
         return null;
       } else {
         InternalConfigurationController.instance = configurationController;
-        InternalConfigurationController.instance.getAppConfiguration().setEnv();
         return configurationController;
       }
     }
+
   }
 }
