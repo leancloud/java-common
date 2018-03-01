@@ -10,7 +10,7 @@ public abstract class BaseOp implements AVOp {
 
   protected LinkedList<AVOp> ops = null;
 
-  OpType getType() {
+  public OpType getType() {
     return type;
   }
 
@@ -18,15 +18,15 @@ public abstract class BaseOp implements AVOp {
     this.type = type;
   }
 
-  List<AVOp> getOps() {
+  public List<AVOp> getOps() {
     return ops;
   }
 
-  void setOps(LinkedList<AVOp> ops) {
+  public void setOps(LinkedList<AVOp> ops) {
     this.ops = ops;
   }
 
-  String getKey() {
+  public String getKey() {
     return key;
   }
 

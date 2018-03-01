@@ -433,8 +433,8 @@ public class PaasClient {
         AsyncHttpResponseHandler handler = createPostHandler(callback);
         AVHttpClient client = clientInstance();
         Request.Builder builder = new Request.Builder();
-        builder.url(url).post(RequestBody.create(AVHttpClient.JSON, paramString));
         updateHeaders(builder, header, callback != null && callback.isRequestStatisticNeed());
+        builder.url(url).post(RequestBody.create(AVHttpClient.JSON, paramString));
         client.execute(builder.build(), sync, handler);
       }
     } catch (Exception exception) {
