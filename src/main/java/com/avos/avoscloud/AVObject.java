@@ -1477,20 +1477,21 @@ public class AVObject implements Parcelable {
   public static final Set<String> INVALID_KEYS = new HashSet<String>();
 
   static {
-    INVALID_KEYS.add("code");
-    INVALID_KEYS.add("uuid");
-    INVALID_KEYS.add("className");
-    INVALID_KEYS.add("keyValues");
-    INVALID_KEYS.add("fetchWhenSave");
-    INVALID_KEYS.add("running");
-    INVALID_KEYS.add("acl");
-    INVALID_KEYS.add("ACL");
-    INVALID_KEYS.add("isDataReady");
-    INVALID_KEYS.add("pendingKeys");
+//  commented by jfeng @2018-03-19, syncing with android-sdk
+//    INVALID_KEYS.add("code");
+//    INVALID_KEYS.add("uuid");
+//    INVALID_KEYS.add("className");
+//    INVALID_KEYS.add("keyValues");
+//    INVALID_KEYS.add("fetchWhenSave");
+//    INVALID_KEYS.add("running");
+//    INVALID_KEYS.add("acl");
+//    INVALID_KEYS.add("error");
+//    INVALID_KEYS.add("isDataReady");
+//    INVALID_KEYS.add("pendingKeys");
     INVALID_KEYS.add(CREATED_AT);
     INVALID_KEYS.add(UPDATED_AT);
     INVALID_KEYS.add(OBJECT_ID);
-    INVALID_KEYS.add("error");
+    INVALID_KEYS.add("ACL");
   }
 
   private boolean checkKey(String key) {
@@ -1499,8 +1500,9 @@ public class AVObject implements Parcelable {
     if (key.startsWith("_")) {
       throw new IllegalArgumentException("key should not start with '_'");
     }
-    if (INVALID_KEYS.contains(key))
+    if (INVALID_KEYS.contains(key)) {
       LogUtil.log.w("Internal key name:`" + key + "`,please use setter/getter for it.");
+    }
     return !INVALID_KEYS.contains(key);
   }
 

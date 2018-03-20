@@ -482,7 +482,12 @@ public class AVUtils {
     String objectId = (String) map.get(objectIdTag);
     String type = (String) map.get(typeTag);
     if (type == null && objectId == null) {
-      parent.put(key, map, false);
+      if (isACL(key)) {
+        AVACL acl = getFromJSON(map.toString(), AVACL.class);
+        parent.setACL(acl);
+      } else {
+        parent.put(key, map, false);
+      }
       return;
     }
 
@@ -507,7 +512,12 @@ public class AVUtils {
       AVObject object = AVUtils.parseObjectFromMap(map);
       parent.put(key, object, false);
     } else {
-      parent.put(key, map, false);
+      if (isACL(type)) {
+        AVACL acl = getFromJSON(map.toString(), AVACL.class);
+        parent.setACL(acl);
+      } else {
+        parent.put(key, map, false);
+      }
     }
   }
 
