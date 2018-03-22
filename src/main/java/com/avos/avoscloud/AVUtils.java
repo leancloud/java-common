@@ -483,7 +483,7 @@ public class AVUtils {
     String type = (String) map.get(typeTag);
     if (type == null && objectId == null) {
       if (isACL(key)) {
-        AVACL acl = getFromJSON(map.toString(), AVACL.class);
+        AVACL acl = new AVACL(map);
         parent.setACL(acl);
       } else {
         parent.put(key, map, false);
@@ -513,7 +513,7 @@ public class AVUtils {
       parent.put(key, object, false);
     } else {
       if (isACL(type)) {
-        AVACL acl = getFromJSON(map.toString(), AVACL.class);
+        AVACL acl = new AVACL(map);
         parent.setACL(acl);
       } else {
         parent.put(key, map, false);

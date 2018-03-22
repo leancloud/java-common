@@ -43,6 +43,17 @@ public class AVACL {
     setWriteAccess(owner, true);
   }
 
+  /**
+   * Create an ACL with permissions
+   * @param aclMap
+   */
+  public AVACL(Map<String, Object> aclMap) {
+    permissionsById = new HashMap<String, Object>();
+    if (null != aclMap) {
+      permissionsById.putAll(aclMap);
+    }
+  }
+
   private Map<String, Object> mapForKey(String key, boolean create) {
     Map<String, Object> map = (Map) permissionsById.get(key);
     if (map == null && create) {
