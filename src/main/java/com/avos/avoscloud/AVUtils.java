@@ -479,15 +479,15 @@ public class AVUtils {
   }
 
   public static void updatePropertyFromMap(AVObject parent, String key, Map<String, Object> map) {
+    if (isACL(key)) {
+      parent.setACL(new AVACL(map));
+      return;
+    }
+
     String objectId = (String) map.get(objectIdTag);
     String type = (String) map.get(typeTag);
     if (type == null && objectId == null) {
-      if (isACL(key)) {
-        AVACL acl = new AVACL(map);
-        parent.setACL(acl);
-      } else {
-        parent.put(key, map, false);
-      }
+      parent.put(key, map, false);
       return;
     }
 
@@ -512,12 +512,7 @@ public class AVUtils {
       AVObject object = AVUtils.parseObjectFromMap(map);
       parent.put(key, object, false);
     } else {
-      if (isACL(type)) {
-        AVACL acl = new AVACL(map);
-        parent.setACL(acl);
-      } else {
-        parent.put(key, map, false);
-      }
+      parent.put(key, map, false);
     }
   }
 
