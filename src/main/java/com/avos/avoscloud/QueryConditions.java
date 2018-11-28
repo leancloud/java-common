@@ -78,7 +78,7 @@ public class QueryConditions {
   }
 
   public Map<String, String> getParameters() {
-    return parameters;
+    return new HashMap<String, String>(parameters);
   }
 
   public void setParameters(Map<String, String> parameters) {

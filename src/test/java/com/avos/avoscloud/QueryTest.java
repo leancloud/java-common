@@ -29,6 +29,15 @@ public class QueryTest extends TestCase {
     assertTrue(query.count() > 0);
   }
 
+  public void testCountThenFind() throws Exception {
+    AVQuery query = new AVQuery(tableName);
+    assertTrue(query.count() > 0);
+    AVObject firstObject = query.getFirst();
+    assertTrue(null != firstObject);
+    List<AVObject> results = query.find();
+    assertTrue(null != results && results.size() > 0);
+  }
+
   public void testGetInBackgroundQuery() throws Exception {
     AVObject gameScore = new AVObject(tableName);
     Random r = new Random();

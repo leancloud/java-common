@@ -1388,7 +1388,7 @@ public class AVQuery<T extends AVObject> {
     parameters.put("limit", Integer.toString(1));
 
     final GetCallback<T> internalCallback = callback;
-    PaasClient.storageInstance().getObject(queryPath(), new AVRequestParams(getParameters()), sync,
+    PaasClient.storageInstance().getObject(queryPath(), new AVRequestParams(parameters), sync,
         null, new GenericObjectCallback() {
           @Override
           public void onSuccess(String content, AVException e) {
@@ -1545,7 +1545,7 @@ public class AVQuery<T extends AVObject> {
     final CountCallback internalCallback = callback;
     String path = queryPath();
     queryPath =
-        PaasClient.storageInstance().getObject(path, new AVRequestParams(getParameters()), sync,
+        PaasClient.storageInstance().getObject(path, new AVRequestParams(parameters), sync,
             null, new GenericObjectCallback() {
               @Override
               public void onSuccess(String content, AVException e) {
