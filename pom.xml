@@ -3,7 +3,7 @@
 
   <groupId>cn.leancloud</groupId>
   <artifactId>leancloud-common</artifactId>
-  <version>0.2.6-SNAPSHOT</version>
+  <version>0.2.6</version>
   <packaging>jar</packaging>
 
   <name>leancloud-common</name>
@@ -30,7 +30,7 @@
     <connection>scm:git:https://github.com/leancloud/java-common.git</connection>
     <developerConnection>scm:git:git@github.com:leancloud/java-common.git</developerConnection>
     <url>http://github.com/leancloud/java-common/tree/master</url>
-    <tag>HEAD</tag>
+    <tag>leancloud-common-0.2.6</tag>
   </scm>
 
   <distributionManagement>
