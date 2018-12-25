@@ -34,7 +34,10 @@ public class AVErrorUtils {
     } else {
       return new AVException(AVException.UNKNOWN, "unknown reason");
     }
+  }
 
+  public static AVException createException(String message, Throwable cause) {
+    return new AVException(message, cause);
   }
 
   // [{"error":{"code":142,"error":"Cloud Code validation failed. Error detail : Error from

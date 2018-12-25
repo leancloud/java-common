@@ -220,7 +220,7 @@ public class AVQuery<T extends AVObject> {
   /**
    * Change the caching policy of this query.
    *
-   * @param cachePolicy caching policy for query
+   * @param policy caching policy for query
    * @return this query.
    */
   @Deprecated
@@ -1189,7 +1189,11 @@ public class AVQuery<T extends AVObject> {
           @Override
           public void onFailure(Throwable error, String content) {
             if (callback != null) {
-              callback.internalDone(null, AVErrorUtils.createException(error, content));
+              if (AVUtils.isBlankContent(content)) {
+                callback.internalDone(null, AVErrorUtils.createException("failed to query path: " + CLOUD_QUERY_PATH, error));
+              } else {
+                callback.internalDone(null, AVErrorUtils.createException(error, content));
+              }
             }
           }
 
@@ -1283,7 +1287,7 @@ public class AVQuery<T extends AVObject> {
     assembleParameters();
     final FindCallback<T> internalCallback = callback;
 
-    String path = queryPath();
+    final String path = queryPath();
     queryPath =
         PaasClient.storageInstance().getObject(path, new AVRequestParams(getParameters()), false,
             null, new GenericObjectCallback() {
@@ -1305,7 +1309,11 @@ public class AVQuery<T extends AVObject> {
               @Override
               public void onFailure(Throwable error, String content) {
                 if (internalCallback != null) {
-                  internalCallback.internalDone(null, AVErrorUtils.createException(error, content));
+                  if (AVUtils.isBlankContent(content)) {
+                    internalCallback.internalDone(null, AVErrorUtils.createException("failed to query path: " + path, error));
+                  } else {
+                    internalCallback.internalDone(null, AVErrorUtils.createException(error, content));
+                  }
                 }
               }
             }, cachePolicy, this.maxCacheAge);
@@ -1388,7 +1396,8 @@ public class AVQuery<T extends AVObject> {
     parameters.put("limit", Integer.toString(1));
 
     final GetCallback<T> internalCallback = callback;
-    PaasClient.storageInstance().getObject(queryPath(), new AVRequestParams(parameters), sync,
+    final String path = queryPath();
+    PaasClient.storageInstance().getObject(path, new AVRequestParams(parameters), sync,
         null, new GenericObjectCallback() {
           @Override
           public void onSuccess(String content, AVException e) {
@@ -1414,7 +1423,11 @@ public class AVQuery<T extends AVObject> {
           @Override
           public void onFailure(Throwable error, String content) {
             if (internalCallback != null) {
-              internalCallback.internalDone(null, AVErrorUtils.createException(error, content));
+              if (AVUtils.isBlankContent(content)) {
+                internalCallback.internalDone(null, AVErrorUtils.createException("failed to query path: " + path, error));
+              } else {
+                internalCallback.internalDone(null, AVErrorUtils.createException(error, content));
+              }
             }
           }
         });
@@ -1443,7 +1456,7 @@ public class AVQuery<T extends AVObject> {
 
   @SuppressWarnings("unchecked")
   private void getInBackground(String objectId, boolean sync, GetCallback<T> callback) {
-    String path = AVPowerfulUtils.getEndpointByAVClassName(getClassName(), objectId);
+    final String path = AVPowerfulUtils.getEndpointByAVClassName(getClassName(), objectId);
     final GetCallback<T> internalCallback = callback;
     this.assembleParameters();
     PaasClient.storageInstance().getObject(path, new AVRequestParams(getParameters()), sync, null,
@@ -1483,7 +1496,11 @@ public class AVQuery<T extends AVObject> {
           @Override
           public void onFailure(Throwable error, String content) {
             if (internalCallback != null) {
-              internalCallback.internalDone(null, AVErrorUtils.createException(error, content));
+              if (AVUtils.isBlankContent(content)) {
+                internalCallback.internalDone(null, AVErrorUtils.createException("failed to query: " + path, error));
+              } else {
+                internalCallback.internalDone(null, AVErrorUtils.createException(error, content));
+              }
             }
 
           }
@@ -1543,7 +1560,7 @@ public class AVQuery<T extends AVObject> {
     parameters.put("count", "1");
     parameters.put("limit", "0");
     final CountCallback internalCallback = callback;
-    String path = queryPath();
+    final String path = queryPath();
     queryPath =
         PaasClient.storageInstance().getObject(path, new AVRequestParams(parameters), sync,
             null, new GenericObjectCallback() {
@@ -1563,7 +1580,11 @@ public class AVQuery<T extends AVObject> {
               @Override
               public void onFailure(Throwable error, String content) {
                 if (internalCallback != null) {
-                  internalCallback.internalDone(0, AVErrorUtils.createException(error, content));
+                  if (AVUtils.isBlankContent(content)) {
+                    internalCallback.internalDone(0, AVErrorUtils.createException("failed to query: " + path, error));
+                  } else {
+                    internalCallback.internalDone(0, AVErrorUtils.createException(error, content));
+                  }
                 }
               }
             }, cachePolicy, maxCacheAge);
@@ -1576,7 +1597,7 @@ public class AVQuery<T extends AVObject> {
    * @return A list of all AVObjects obeying the conditions set in this query.
    */
   public List<T> find() throws AVException {
-    String path = queryPath();
+    final String path = queryPath();
     this.assembleParameters();
     final List<T> result = new ArrayList<T>();
     queryPath =
@@ -1593,7 +1614,12 @@ public class AVQuery<T extends AVObject> {
 
               @Override
               public void onFailure(Throwable error, String content) {
-                AVExceptionHolder.add(AVErrorUtils.createException(error, content));
+                if (AVUtils.isBlankContent(content)) {
+                  AVExceptionHolder.add(AVErrorUtils.createException("failed to query: " + path, error));
+                } else {
+                  AVExceptionHolder.add(AVErrorUtils.createException(error, content));
+                }
+
               }
             }, cachePolicy, this.maxCacheAge);
     if (AVExceptionHolder.exists()) {
