@@ -1560,9 +1560,9 @@ public class AVQuery<T extends AVObject> {
     parameters.put("count", "1");
     parameters.put("limit", "0");
     final CountCallback internalCallback = callback;
-    final String tmpPath = queryPath();
+    final String path = queryPath();
     queryPath =
-        PaasClient.storageInstance().getObject(tmpPath, new AVRequestParams(parameters), sync,
+        PaasClient.storageInstance().getObject(path, new AVRequestParams(parameters), sync,
             null, new GenericObjectCallback() {
               @Override
               public void onSuccess(String content, AVException e) {
@@ -1581,9 +1581,9 @@ public class AVQuery<T extends AVObject> {
               public void onFailure(Throwable error, String content) {
                 if (internalCallback != null) {
                   if (AVUtils.isBlankContent(content)) {
-                    internalCallback.internalDone(null, AVErrorUtils.createException("failed to query: " + tmpPath, error));
+                    internalCallback.internalDone(0, AVErrorUtils.createException("failed to query: " + path, error));
                   } else {
-                    internalCallback.internalDone(null, AVErrorUtils.createException(error, content));
+                    internalCallback.internalDone(0, AVErrorUtils.createException(error, content));
                   }
                 }
               }
